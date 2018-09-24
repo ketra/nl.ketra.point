@@ -12,31 +12,36 @@
   "category": [
     "security"
   ],
- "drivers": [
+  "drivers": [
+    {
+      "id": "Point",
+      "name": "Minut Point",
+      "class": "sensor",
+      "capabilities": [
+        "measure_humidity",
+        "measure_luminance",
+        "measure_noise",
+        "alarm_motion"
+      ],
+      "pair": [
         {
-            "id": "Point",
-	          "name": "Minut Point",
-            "class": "sensor",
-            "capabilities": ["measure_humidity", "measure_luminance", "measure_noise", "alarm_motion"],
-            "pair": [
-                {
-                    "id": "login_oauth2",
-                    "template": "login_oauth2"
-                },
-                {
-                    "id": "list_devices",
-                    "template": "list_devices_singular",
-                    "navigation": {
-                        "next": "add_devices"
-                    }
-                },
-                {
-                    "id": "add_devices",
-                    "template": "add_devices"
-                }
-            ]
+          "id": "login_oauth2",
+          "template": "login_oauth2"
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices_singular",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
         }
-],
+      ]
+    }
+  ],
   "permissions": [],
   "images": {
     "large": "/assets/images/large.png",
