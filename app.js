@@ -1,11 +1,14 @@
 'use strict';
 
 const Homey = require('homey');
+const appname = "nl.ketra.point"
+const util = require('./Lib/utils')
 
-class MyApp extends Homey.App {
-	
+class PointApp extends Homey.App {
+
 	onInit() {
-		this.log('MyApp is running...');
+		this.log('PointApp is running...');
+		util.logtoall("Main","App Started")
 	}
 	
 }
