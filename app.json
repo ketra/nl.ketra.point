@@ -18,9 +18,10 @@
       "name": "Minut Point",
       "class": "sensor",
       "capabilities": [
+        "measure_temperature",
         "measure_humidity",
-        "measure_luminance",
         "measure_noise",
+        "measure_pressure",
         "alarm_motion"
       ],
       "pair": [
