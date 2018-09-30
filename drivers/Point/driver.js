@@ -9,12 +9,17 @@ class Point extends Homey.Driver  {
     onPair(socket) {
         let utils = new util()
         let API = new PointAPI()
-            try {
+        try {
+            if (HomeyHomey.ManagerSettings.get('refresh_token') === undefined) {
                 API.startOath(socket);
             }
-            catch (err) {
-                utils.logtoall(err)
-                return callback(new Error('invalid_token'));
+            else {
+                API.ListDevices(socket);
+            }
+               
+            }
+        catch (err) {
+                utils.logtoall("Error On Pairing Device: " + err)
             }
 
     }

@@ -17,7 +17,7 @@ class API {
         this._token = null;
         axios.defaults.baseURL = 'https://api.minut.com/v1/';
         this.utils = new util();
-        this.authenticate()
+        //this.authenticate()
     }
 
     async authenticate() {
@@ -27,9 +27,15 @@ class API {
             this.RefreshOath();
         }
         catch (err) {
-
             console.log(err)
         }
+    }
+
+    async ListDevices(socket) {
+        await this.authenticate();
+        socket.on('list_devices', (data, callback) => {
+            this.GetDevices(callback);
+        })
     }
 
     async startOath(socket) {
@@ -73,8 +79,8 @@ class API {
             refresh_token: Homey.ManagerSettings.get('refresh_token'),
             grant_type: "refresh_token"
         })
-        this.utils.logtoall("Refresh Auth", "Received access_token" + postdata.data.access_token)
-        this.utils.logtoall"Refresh Auth", "Received refresh_token" + postdata.data.refresh_token)
+        this.utils.logtoall("Refresh Auth", "Received access_token " + postdata.data.access_token)
+        this.utils.logtoall("Refresh Auth", "Received refresh_token " + postdata.data.refresh_token)
         Homey.ManagerSettings.set('access_token', postdata.data.access_token)
         Homey.ManagerSettings.set('refresh_token', postdata.data.refresh_token)
     }
