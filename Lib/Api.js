@@ -17,7 +17,7 @@ class API {
         this._token = null;
         axios.defaults.baseURL = 'https://api.minut.com/v1/';
         this.utils = new util();
-        this.authenticate()
+        this._authenticated = false;
     }
 
     async authenticate() {
@@ -29,6 +29,17 @@ class API {
         catch (err) {
 
             console.log(err)
+        }
+    }
+    async VerifyAuth(socket)
+    {
+        if (Homey.ManagerSettings.get('access_token') === undefined)
+            return false
+        else
+        {
+            this.RefreshOath((err, result) => {
+                return true
+            })
         }
     }
 
@@ -64,53 +75,94 @@ class API {
         })
 
     }
-    async RefreshOath() {
-        this.utils.logtoall("Refresh Auth","Refresing Oath Token.")
-        let postdata = await axios.post('/oauth/token', {
-            redirect_uri: this._redirectUri,
-            client_id: this._clientId,
-            client_secret: this._clientSecret,
-            refresh_token: Homey.ManagerSettings.get('refresh_token'),
-            grant_type: "refresh_token"
+    async _Get(url, callback) {
+        axios.get(url).then(function (result) {
+            callback(result)
+        }).catch(function (err) {
+            if (err.statusCode === 401)
+            {
+                this._authenticated = false;
+            }
         })
-        this.utils.logtoall("Refresh Auth", "Received access_token" + postdata.data.access_token)
-        this.utils.logtoall"Refresh Auth", "Received refresh_token" + postdata.data.refresh_token)
-        Homey.ManagerSettings.set('access_token', postdata.data.access_token)
-        Homey.ManagerSettings.set('refresh_token', postdata.data.refresh_token)
+    }
+    async _GetOptions(options, callback)
+    {
+        axios(options).then(function (result) {
+            callback(result)
+        }).catch(function (err) {
+            if (err.statusCode === 401) {
+                this._authenticated = false;
+            }
+        })
+    }
+
+    async RefreshOath(callback) {
+        this.utils.logtoall("Refresh Auth", "Refresing Oath Token.")
+        url = '/oauth/token'
+        const options = {
+            method: 'GET',
+            data: {
+                redirect_uri: this._redirectUri,
+                client_id: this._clientId,
+                client_secret: this._clientSecret,
+                refresh_token: Homey.ManagerSettings.get('refresh_token'),
+                grant_type: "refresh_token"
+            }, url
+        }
+        this._GetOptions(options, (err, result) => {
+            if (err)
+                Promise.reject(err)
+            this.utils.logtoall("Refresh Auth", "Received access_token" + result.data.access_token)
+            this.utils.logtoall("Refresh Auth", "Received refresh_token" + result.data.refresh_token)
+            Homey.ManagerSettings.set('access_token', result.data.access_token)
+            Homey.ManagerSettings.set('refresh_token', result.data.refresh_token)
+            return Promise.resolve()
+                
+        })
+
     }
 
     async authorize(code) {
-        let postdata = await axios.post('/oauth/token', {
-            redirect_uri: this._redirectUri,
-            client_id: this._clientId,
-            client_secret: this._clientSecret,
-            code: code,
-            grant_type: "authorization_code"
-        })
-        Homey.ManagerSettings.set('access_token', postdata.data.access_token)
-        Homey.ManagerSettings.set('refresh_token', postdata.data.refresh_token)
-        this.utils.logtoall("Token", "Received token: " + postdata.data.access_token)
-        axios.defaults.headers.common['Authorization'] = "Bearer " + postdata.data.access_token
-        setInterval(this.RefreshOath.bind(this), 3600 * 1000)
+        url = '/oauth/token'
+        const options = {
+            method: 'GET',
+            data: {
+                redirect_uri: this._redirectUri,
+                client_id: this._clientId,
+                client_secret: this._clientSecret,
+                code: code,
+                grant_type: "authorization_code"
+            }, url
+        }
+        this._GetOptions(options, (err, result) => {
+            if (err)
+                Promise.reject(err)
+            Homey.ManagerSettings.set('access_token', postdata.data.access_token)
+            Homey.ManagerSettings.set('refresh_token', postdata.data.refresh_token)
+            this.utils.logtoall("Token", "Received token: " + postdata.data.access_token)
+            axios.defaults.headers.common['Authorization'] = "Bearer " + postdata.data.access_token
+            setInterval(this.RefreshOath.bind(this), 3600 * 1000)
         //console.log(postdata.data);
+        })
     }
 
     async GetDevices(callback) {
         let foundDevices = []
-        let result = await axios.get('/devices')
-        //console.log(result.data.devices);
-        result.data.devices.forEach((data) => {
-            foundDevices.push({
-                name: data.description,
-                data: {
-                    id: data.device_id
-                }
+        this._Get((error,result) => {
+            result.data.devices.forEach((data) => {
+                foundDevices.push({
+                    name: data.description,
+                    data: {
+                        id: data.device_id
+                    }
+                })
             })
+            console.log(foundDevices)
+            callback(null, foundDevices)
+            return this._onPairListDevices(foundDevices)
         })
-        console.log(foundDevices)
-        callback(null, foundDevices)
-        return this._onPairListDevices(foundDevices)
     }
+
     async _onPairListDevices(result) {
         return [];
     }
@@ -124,7 +176,7 @@ class API {
         catch (err) {
             if (err.statusCode === 401) {
                 await this.authenticate()
-                return this.Getsound(device)
+                return this.GetValue(device, action)
             }
 
             console.log(err)
