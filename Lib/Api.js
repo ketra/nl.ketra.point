@@ -31,58 +31,67 @@ class API {
             console.log(err)
         }
     }
-    async VerifyAuth(socket)
+    async VerifyAuth(socket, callback)
     {
         if (Homey.ManagerSettings.get('access_token') === undefined)
-            return false
+            callback(new Error("No acces_token found"));
         else
         {
             this.RefreshOath((err, result) => {
                 if (err)
-                    return false;
-                return true
+                    callback(err);
+                socket.emit('authorized');
+                callback(null, true);
             })
         }
     }
 
     async startOath(socket) {
-        if (!this.VerifyAuth()) {
+        this.VerifyAuth(socket, (err, result) => {
+            if (err) {
+                let authrul = this._oAuth2AuthorizationUrl + '?client_id=' + this._clientId + '&response_type=code&redirect_uri=' + this._redirectUri
+                this.utils.logtoall("Pair", "Started Pairing. on url " + authrul)
+                let myOAuth2Callback = new Homey.CloudOAuth2Callback(authrul)
+                myOAuth2Callback
+                    .on('url', url => {
 
-            let authrul = this._oAuth2AuthorizationUrl + '?client_id=' + this._clientId + '&response_type=code&redirect_uri=' + this._redirectUri
-            this.utils.logtoall("Pair", "Started Pairing. on url " + authrul)
-            let myOAuth2Callback = new Homey.CloudOAuth2Callback(authrul)
-            myOAuth2Callback
-                .on('url', url => {
+                        // dend the URL to the front-end to open a popup
+                        socket.emit('url', url);
 
-                    // dend the URL to the front-end to open a popup
-                    socket.emit('url', url);
-
-                })
-                .on('code', code => {
-                    this.utils.logtoall("Pair", "Received Code " + code)
-                    this.authorize(code).then(function () {
-                        this.utils.logtoall("Startauth", "Authenticated succesfully")
-                        socket.emit('authorized');
-                    }).catch(function (err) {
+                    })
+                    .on('code', code => {
+                        this.utils.logtoall("Pair", "Received Code " + code)
+                        this.authorize(code).then(function () {
+                            this.utils.logtoall("Startauth", "Authenticated succesfully")
+                            socket.emit('authorized');
+                        }).catch(function (err) {
+                            this.utils.logtoall("Pair", "Error Received on Pair: " + err)
+                            socket.emit('error', err);
+                        })
+                    })
+                    .generate()
+                    .catch(err => {
                         this.utils.logtoall("Pair", "Error Received on Pair: " + err)
                         socket.emit('error', err);
                     })
+            }
+            else {
+                socket.on('list_devices', (data, callback) => {
+                    this.utils.logtoall("Oauth process", "Setup ListDevices")
+                    this.GetDevices(callback);
                 })
-                .generate()
-                .catch(err => {
-                    this.utils.logtoall("Pair", "Error Received on Pair: " + err)
-                    socket.emit('error', err);
-                })
-        }
-        socket.on('list_devices', (data, callback) => {
-            this.GetDevices(callback);
+            }
         })
+
 
     }
     async _Get(url, callback) {
+        this.utils.logtoall("_GET", "Getting details from " + url)
         axios.get(url).then(function (result) {
+            //console.log(result)
             callback(null,result)
         }).catch(function (err) {
+            console.log(err)
             if (err.statusCode === 401)
             {
                 this._authenticated = false;
@@ -104,8 +113,8 @@ class API {
 
     async RefreshOath(callback) {
         this.utils.logtoall("Refresh Auth", "Refresing Oath Token.")
-        url = '/oauth/token'
-        const options = {
+        let url = '/oauth/token'
+        let options = {
             method: 'GET',
             data: {
                 redirect_uri: this._redirectUri,
@@ -116,20 +125,22 @@ class API {
             }, url
         }
         this._GetOptions(options, (err, result) => {
-            if (err)
-                Promise.reject(err)
+            if (err) {
+                callback(err)
+            }
             this.utils.logtoall("Refresh Auth", "Received access_token" + result.data.access_token)
             this.utils.logtoall("Refresh Auth", "Received refresh_token" + result.data.refresh_token)
+            axios.defaults.headers.common['Authorization'] = "Bearer " + Homey.ManagerSettings.get('access_token')
             Homey.ManagerSettings.set('access_token', result.data.access_token)
             Homey.ManagerSettings.set('refresh_token', result.data.refresh_token)
-            return Promise.resolve()   
+            callback(null,"")
         })
 
     }
 
     async authorize(code) {
-        url = '/oauth/token'
-        const options = {
+        let url = '/oauth/token'
+        let options = {
             method: 'GET',
             data: {
                 redirect_uri: this._redirectUri,
@@ -153,7 +164,8 @@ class API {
 
     async GetDevices(callback) {
         let foundDevices = []
-        this._Get((error, result) => {
+        this._Get('/devices',(error, result) => {
+            this.utils.logtoall("ListDevices ", result.data)
             if (error)
                 callback(error)
             result.data.devices.forEach((data) => {
@@ -174,24 +186,23 @@ class API {
         return [];
     }
 
-    async GetValue(device, action) {
+    async GetValue(device, action, callback) {
         try {
             this._Get('/devices/' + device + '/' + action, (error, result) => {
-                if (error)
                     
                 this.utils.logtoall("DataCollection", "Collecting " + action)
-                return result.data.values[0].value
+                console.log(result.data.values[0].value)
+                callback(null, result.data.values[0].value)
             })
-            let result = await axios.get('/devices/' + device + '/' + action)
-
         }
         catch (err) {
-            if (err.statusCode === 401) {
+            if (err.response.status === 401) {
                 await this.authenticate()
                 return this.GetValue(device, action)
             }
-
-            console.log(err)
+            else {
+                console.log(err)
+            }
         }
     }
 }
