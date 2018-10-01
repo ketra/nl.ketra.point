@@ -38,38 +38,42 @@ class API {
         else
         {
             this.RefreshOath((err, result) => {
+                if (err)
+                    return false;
                 return true
             })
         }
     }
 
     async startOath(socket) {
+        if (!this.VerifyAuth()) {
 
-        let authrul = this._oAuth2AuthorizationUrl + '?client_id=' + this._clientId + '&response_type=code&redirect_uri=' + this._redirectUri
-        this.utils.logtoall("Pair", "Started Pairing. on url " + authrul)
-        let myOAuth2Callback = new Homey.CloudOAuth2Callback(authrul)
-        myOAuth2Callback
-            .on('url', url => {
+            let authrul = this._oAuth2AuthorizationUrl + '?client_id=' + this._clientId + '&response_type=code&redirect_uri=' + this._redirectUri
+            this.utils.logtoall("Pair", "Started Pairing. on url " + authrul)
+            let myOAuth2Callback = new Homey.CloudOAuth2Callback(authrul)
+            myOAuth2Callback
+                .on('url', url => {
 
-                // dend the URL to the front-end to open a popup
-                socket.emit('url', url);
+                    // dend the URL to the front-end to open a popup
+                    socket.emit('url', url);
 
-            })
-            .on('code', code => {
-                this.utils.logtoall("Pair", "Received Code " + code)
-                this.authorize(code).then(function () {
-                    this.utils.logtoall("Startauth","Authenticated succesfully")
-                    socket.emit('authorized');
-                }).catch(function (err) {
+                })
+                .on('code', code => {
+                    this.utils.logtoall("Pair", "Received Code " + code)
+                    this.authorize(code).then(function () {
+                        this.utils.logtoall("Startauth", "Authenticated succesfully")
+                        socket.emit('authorized');
+                    }).catch(function (err) {
+                        this.utils.logtoall("Pair", "Error Received on Pair: " + err)
+                        socket.emit('error', err);
+                    })
+                })
+                .generate()
+                .catch(err => {
                     this.utils.logtoall("Pair", "Error Received on Pair: " + err)
                     socket.emit('error', err);
                 })
-            })
-            .generate()
-            .catch(err => {
-                this.utils.logtoall("Pair", "Error Received on Pair: " + err)
-                socket.emit('error', err);
-            })
+        }
         socket.on('list_devices', (data, callback) => {
             this.GetDevices(callback);
         })
@@ -77,21 +81,23 @@ class API {
     }
     async _Get(url, callback) {
         axios.get(url).then(function (result) {
-            callback(result)
+            callback(null,result)
         }).catch(function (err) {
             if (err.statusCode === 401)
             {
                 this._authenticated = false;
+                callback(401, null)
             }
         })
     }
     async _GetOptions(options, callback)
     {
         axios(options).then(function (result) {
-            callback(result)
+            callback(null,result)
         }).catch(function (err) {
             if (err.statusCode === 401) {
                 this._authenticated = false;
+                callback(401, null)
             }
         })
     }
@@ -116,8 +122,7 @@ class API {
             this.utils.logtoall("Refresh Auth", "Received refresh_token" + result.data.refresh_token)
             Homey.ManagerSettings.set('access_token', result.data.access_token)
             Homey.ManagerSettings.set('refresh_token', result.data.refresh_token)
-            return Promise.resolve()
-                
+            return Promise.resolve()   
         })
 
     }
@@ -148,7 +153,9 @@ class API {
 
     async GetDevices(callback) {
         let foundDevices = []
-        this._Get((error,result) => {
+        this._Get((error, result) => {
+            if (error)
+                callback(error)
             result.data.devices.forEach((data) => {
                 foundDevices.push({
                     name: data.description,
@@ -169,9 +176,14 @@ class API {
 
     async GetValue(device, action) {
         try {
+            this._Get('/devices/' + device + '/' + action, (error, result) => {
+                if (error)
+                    
+                this.utils.logtoall("DataCollection", "Collecting " + action)
+                return result.data.values[0].value
+            })
             let result = await axios.get('/devices/' + device + '/' + action)
-            this.utils.logtoall("DataCollection","Collecting "+ action)
-            return result.data.values[0].value
+
         }
         catch (err) {
             if (err.statusCode === 401) {
