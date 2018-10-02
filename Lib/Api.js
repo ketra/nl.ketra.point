@@ -24,7 +24,7 @@ class API {
     async authenticate(callback) {
         try {
             clearInterval(this.OauthTimer);
-            this.OauthTimer = setInterval(this.RefreshOath.bind(this), 3600 * 100)
+            this.OauthTimer = setInterval(this.RefreshOath(null).bind(this), 3600 * 100)
             axios.defaults.headers.common['Authorization'] = "Bearer " + Homey.ManagerSettings.get('access_token')
             this.RefreshOath((error, result) => { });
             callback();
@@ -130,14 +130,16 @@ class API {
         this._GetOptions(options, (err, result) => {
             if (err) {
                 Homey.app.log(err)
-                callback(err)
+                if (typeof callback === "function")
+                    callback(err)
             }
             this.utils.logtoall("Refresh Auth", "Received access_token" + result.data.access_token)
             this.utils.logtoall("Refresh Auth", "Received refresh_token" + result.data.refresh_token)
             axios.defaults.headers.common['Authorization'] = "Bearer " + Homey.ManagerSettings.get('access_token')
             Homey.ManagerSettings.set('access_token', result.data.access_token)
             Homey.ManagerSettings.set('refresh_token', result.data.refresh_token)
-            callback(null,"")
+            if (typeof callback === "function")
+                callback(null,"")
         })
 
     }
