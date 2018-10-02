@@ -9,11 +9,13 @@ class point extends Homey.Device {
     onInit() {
         this._utils = new utils()
         this._API = new PointAPI()
-        this._API.authenticate();
+        this._API.authenticate((error, result) =>
+        { });
         let data = this.getData();
         this._utils.logtoall("Init",data)
         this.id = data.id
-        setInterval(this._GetStateInfo.bind(this),60 * 1000)
+        setInterval(this._GetStateInfo.bind(this), 60 * 1000)
+        this._GetStateInfo();
     }
     async _GetStateInfo() {
         this._API.GetValue(this.id, 'temperature', (error, result) => {

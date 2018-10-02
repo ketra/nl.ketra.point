@@ -18,13 +18,16 @@ class API {
         axios.defaults.baseURL = 'https://api.minut.com/v1/';
         this.utils = new util();
         this._authenticated = false;
+        this.OauthTimer;
     }
 
-    async authenticate() {
+    async authenticate(callback) {
         try {
-            setInterval(this.RefreshOath.bind(this), 3600 * 1000)
+            clearInterval(this.OauthTimer);
+            this.OauthTimer = setInterval(this.RefreshOath.bind(this), 3600 * 100)
             axios.defaults.headers.common['Authorization'] = "Bearer " + Homey.ManagerSettings.get('access_token')
-            this.RefreshOath();
+            this.RefreshOath((error, result) => { });
+            callback();
         }
         catch (err) {
 
@@ -38,8 +41,10 @@ class API {
         else
         {
             this.RefreshOath((err, result) => {
-                if (err)
+                if (err) {
+                    Homey.app.log(err)
                     callback(err);
+                }
                 socket.emit('authorized');
                 callback(null, true);
             })
@@ -88,13 +93,11 @@ class API {
     async _Get(url, callback) {
         this.utils.logtoall("_GET", "Getting details from " + url)
         axios.get(url).then(function (result) {
-            //console.log(result)
             callback(null,result)
         }).catch(function (err) {
-            console.log(err)
-            if (err.statusCode === 401)
+            Homey.app.log(err)
+            if (err.response.status === 401)
             {
-                this._authenticated = false;
                 callback(401, null)
             }
         })
@@ -104,8 +107,8 @@ class API {
         axios(options).then(function (result) {
             callback(null,result)
         }).catch(function (err) {
-            if (err.statusCode === 401) {
-                this._authenticated = false;
+            Homey.app.log(err)
+            if (err.response.status === 401) {
                 callback(401, null)
             }
         })
@@ -126,6 +129,7 @@ class API {
         }
         this._GetOptions(options, (err, result) => {
             if (err) {
+                Homey.app.log(err)
                 callback(err)
             }
             this.utils.logtoall("Refresh Auth", "Received access_token" + result.data.access_token)
@@ -151,8 +155,10 @@ class API {
             }, url
         }
         this._GetOptions(options, (err, result) => {
-            if (err)
+            if (err) {
                 Promise.reject(err)
+                Homey.app.log(err)
+            }
             Homey.ManagerSettings.set('access_token', postdata.data.access_token)
             Homey.ManagerSettings.set('refresh_token', postdata.data.refresh_token)
             this.utils.logtoall("Token", "Received token: " + postdata.data.access_token)
@@ -176,7 +182,7 @@ class API {
                     }
                 })
             })
-            console.log(foundDevices)
+            Homey.app.log(err)
             callback(null, foundDevices)
             return this._onPairListDevices(foundDevices)
         })
@@ -187,23 +193,20 @@ class API {
     }
 
     async GetValue(device, action, callback) {
-        try {
             this._Get('/devices/' + device + '/' + action, (error, result) => {
-                    
-                this.utils.logtoall("DataCollection", "Collecting " + action)
-                console.log(result.data.values[0].value)
-                callback(null, result.data.values[0].value)
+                if (error) {
+                    Homey.app.log(error)
+                    if (error === 401) {
+                        this.authenticate((error, result) => {
+                            callback(null, this.GetValue(device, action, callback))
+                        })
+                    }
+                }
+                else {
+                    this.utils.logtoall("DataCollection", "Collecting " + action)
+                    callback(null, result.data.values[0].value)
+                }
             })
-        }
-        catch (err) {
-            if (err.response.status === 401) {
-                await this.authenticate()
-                return this.GetValue(device, action)
-            }
-            else {
-                console.log(err)
-            }
-        }
     }
 }
 module.exports = API

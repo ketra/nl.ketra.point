@@ -5,6 +5,6 @@
     "\\drivers\\Point",
     "\\Lib"
   ],
-  "SelectedNode": "\\Lib\\Api.js",
+  "SelectedNode": "\\drivers\\Point\\device.js",
   "PreviewInSolutionExplorer": false
 }
