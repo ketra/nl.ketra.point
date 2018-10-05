@@ -7,10 +7,13 @@ const util = require('./Lib/utils.js')
 class PointApp extends Homey.App {
 
     onInit() {
-        var utils = new util();
+        this.utils = new util();
 		this.log('PointApp is running...');
-		utils.logtoall("Main","App Started")
+		this.utils.logtoall("Main","App Started")
 	}
+    log(Text) {
+        this.utils.logtoall("",Text)
+    }
 }
 
 module.exports = PointApp;

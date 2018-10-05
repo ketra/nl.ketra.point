@@ -12,44 +12,60 @@
   "category": [
     "security"
   ],
-  "drivers": [
-    {
-      "id": "Point",
-      "name": "Minut Point",
-      "class": "sensor",
-      "capabilities": [
-        "measure_temperature",
-        "measure_humidity",
-        "measure_noise",
-        "measure_pressure",
-        "alarm_motion"
-      ],
-      "pair": [
-        {
-          "id": "login_oauth2",
-          "template": "login_oauth2"
-        },
-        {
-          "id": "list_devices",
-          "template": "list_devices_singular",
-          "navigation": {
-            "next": "add_devices"
-          }
-        },
-        {
-          "id": "add_devices",
-          "template": "add_devices"
+  "flow": {
+    "triggers": [
+      {
+        "id": "Generic_alarm",
+        "title": {
+          "en": "A generic alarm Triggered."
         }
-      ]
-    }
-  ],
-  "permissions": [],
-  "images": {
-    "large": "/assets/images/large.png",
-    "small": "/assets/images/small.png"
+      },
+      {
+        "id": "alarm_heard",
+        "title": {
+          "en": "An alarm was heard."
+        }
+      }
+    ]
   },
-  "author": {
-    "name": "kevin traa",
-    "email": "ketra90@gmail.com"
+    "drivers": [
+      {
+        "id": "Point",
+        "name": "Minut Point",
+        "class": "sensor",
+        "capabilities": [
+          "measure_temperature",
+          "measure_humidity",
+          "measure_noise",
+          "measure_pressure",
+          "alarm_generic"
+        ],
+        "pair": [
+          {
+            "id": "login_oauth2",
+            "template": "login_oauth2"
+          },
+          {
+            "id": "list_devices",
+            "template": "list_devices_singular",
+            "navigation": {
+              "next": "add_devices"
+            }
+          },
+          {
+            "id": "add_devices",
+            "template": "add_devices"
+          }
+        ]
+      }
+    ],
+    "permissions": [],
+    "images": {
+      "large": "/assets/images/large.png",
+      "small": "/assets/images/small.png"
+    },
+    "author": {
+      "name": "kevin traa",
+      "email": "ketra90@gmail.com"
+    }
   }
-}
