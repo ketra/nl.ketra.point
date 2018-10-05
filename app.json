@@ -18,14 +18,42 @@
         "id": "Generic_alarm",
         "title": {
           "en": "A generic alarm Triggered."
-        }
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
       },
       {
         "id": "alarm_heard",
         "title": {
           "en": "An alarm was heard."
-        }
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
+      },
+      {
+        "id": "short_button_press",
+        "title": {
+          "en": "Button was pressed"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
       }
+
     ]
   },
     "drivers": [
