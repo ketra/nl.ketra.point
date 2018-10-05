@@ -24,7 +24,7 @@ class API {
     async authenticate(callback) {
         try {
             clearInterval(this.OauthTimer);
-            this.OauthTimer = setInterval(this.RefreshOath(null).bind(this), 3600 * 100)
+            this.OauthTimer = setInterval(this.RefreshOath.bind(this), 3600 * 100)
             axios.defaults.headers.common['Authorization'] = "Bearer " + Homey.ManagerSettings.get('access_token')
             this.RefreshOath((error, result) => { });
             callback();
@@ -102,6 +102,7 @@ class API {
             }
         })
     }
+
     async _GetOptions(options, callback)
     {
         axios(options).then(function (result) {
@@ -112,6 +113,66 @@ class API {
                 callback(401, null)
             }
         })
+    }
+
+    async _Post(url, data, callback)
+    {
+        this.utils.logtoall("_POST", "Posting Data" + data)
+        //console.log(data)
+        axios.post(url, data, {
+            baseURL: 'https://api.minut.com/draft1/'
+        }).then(function (response) {
+            callback(null,response.data)
+        }).catch(function (err) {
+            console.log(err)
+            if (err.response.status === 401) {
+                callback(401, null)
+            }
+            callback(err,null)
+        });
+    }
+
+    async SetWebhook(callback)
+    {
+        let data = {
+            "url": Homey.env.WEBHOOK_URL,
+            "events": ["alarm_heard",
+                "short_button_press",
+                "temperature_high",
+                "temperature_low",
+                "temperature_dropped_normal",
+                "temperature_risen_normal",
+                "humidity_high",
+                "humidity_low",
+                "humidity_dropped_normal",
+                "humidity_risen_normal",
+                "device_offline",
+                "device_online",
+                "tamper",
+                "battery_low",
+                "avg_sound_high",
+                "sound_level_high_quiet_hours",
+                "sound_level_high_despite_warning",
+                "sound_level_dropped_normal"]
+        }
+        this.authenticate((error, result) => {
+            if (!error) {
+                this._Post('/webhooks', data, (error, result) => {
+                    if (error) {
+                        if (error === 401) {
+                            this.authenticate((error, result) => {
+                                callback(null, this.SetWebhook(callback))
+                            })
+                        }
+                        else
+                            callback(error, null)
+                    }
+                    else {
+                        callback(null, result);
+                    }
+                })
+            }
+        });
     }
 
     async RefreshOath(callback) {
@@ -184,7 +245,7 @@ class API {
                     }
                 })
             })
-            Homey.app.log(err)
+            Homey.app.log(error)
             callback(null, foundDevices)
             return this._onPairListDevices(foundDevices)
         })
