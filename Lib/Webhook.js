@@ -1,8 +1,10 @@
-const Homey = require('homey');
+const Homey = require('homey'); 
+const API = require('./Api')
 
 let id = Homey.env.WEBHOOK_ID;
 let secret = Homey.env.WEBHOOK_SECRET;
 let devices = [];
+let generictimeout;
 
 class pointWebhook {
 
@@ -29,7 +31,7 @@ class pointWebhook {
                 Homey.app.log('Created At: ' + args.body.event.created_at);
                 Homey.app.log('type: ' + args.body.event.type);
                 let device = this.findDevice(args.body.event.device_id)
-                device.setCapabilityValue("alarm_generic", true);
+                this.SetValue(device);
                 switch (args.body.event.type) {
                     case "alarm_heard":
                         this._flowTriggeralarm_heard.trigger(device, {}, {})
@@ -51,6 +53,14 @@ class pointWebhook {
             })
             .catch(this.error)
     }
+
+    SetValue(device)
+    {
+        clearTimeout(generictimeout);
+        device.setCapabilityValue("alarm_generic", true);
+        generictimeout = setTimeout(() => { device.setCapabilityValue("alarm_generic", false) }, 30000);
+    }
+
     findDevice(deviceid)
     {
        return devices.find(function (device) { return device.id === deviceid  });

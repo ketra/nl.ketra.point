@@ -134,44 +134,79 @@ class API {
 
     async SetWebhook(callback)
     {
-        let data = {
-            "url": Homey.env.WEBHOOK_URL,
-            "events": ["alarm_heard",
-                "short_button_press",
-                "temperature_high",
-                "temperature_low",
-                "temperature_dropped_normal",
-                "temperature_risen_normal",
-                "humidity_high",
-                "humidity_low",
-                "humidity_dropped_normal",
-                "humidity_risen_normal",
-                "device_offline",
-                "device_online",
-                "tamper",
-                "battery_low",
-                "avg_sound_high",
-                "sound_level_high_quiet_hours",
-                "sound_level_high_despite_warning",
-                "sound_level_dropped_normal"]
-        }
-        this.authenticate((error, result) => {
-            if (!error) {
-                this._Post('/webhooks', data, (error, result) => {
-                    if (error) {
-                        if (error === 401) {
-                            this.authenticate((error, result) => {
-                                callback(null, this.SetWebhook(callback))
-                            })
-                        }
-                        else
-                            callback(error, null)
-                    }
-                    else {
-                        callback(null, result);
-                    }
-                })
+        this.CheckWebhook((error, result) => {
+            if (result)
+                callback(null, result);
+            let data = {
+                "url": Homey.env.WEBHOOK_URL,
+                "events": ["alarm_heard",
+                    "short_button_press",
+                    "temperature_high",
+                    "temperature_low",
+                    "temperature_dropped_normal",
+                    "temperature_risen_normal",
+                    "humidity_high",
+                    "humidity_low",
+                    "humidity_dropped_normal",
+                    "humidity_risen_normal",
+                    "device_offline",
+                    "device_online",
+                    "tamper",
+                    "battery_low",
+                    "avg_sound_high",
+                    "sound_level_high_quiet_hours",
+                    "sound_level_high_despite_warning",
+                    "sound_level_dropped_normal"]
             }
+            this.authenticate((error, result) => {
+                if (!error) {
+                    this._Post('/webhooks', data, (error, result) => {
+                        if (error) {
+                            if (error === 401) {
+                                this.authenticate((error, result) => {
+                                    callback(null, this.SetWebhook(callback))
+                                })
+                            }
+                            else
+                                callback(error, null)
+                        }
+                        else {
+                            callback(null, result);
+                        }
+                    })
+                }
+            });
+        });
+    }
+
+    CheckWebhook(callback) {
+        this.GetWekhook((err, result) => {
+            var found;
+            for (var i = 0; i < result.length; i++) {
+                if (result[i].url == Homey.env.WEBHOOK_URL) {
+                    found = result[i];
+                    break;
+                }
+            }
+            callback(null, found);
+        })
+    }
+
+    async GetWekhook(callback) {
+        this.utils.logtoall("Webhook", "Collecting Webhookds")
+        let url = '/webhooks'
+        let options = {
+            baseURL: 'https://api.minut.com/draft1/',
+            method: 'GET',
+            url
+        }
+        this._GetOptions(options, (err, result) => {
+            if (err) {
+                Homey.app.log(err)
+                if (typeof callback === "function")
+                    callback(err)
+            }
+            callback(null, result.data.hooks);
         });
     }
 
@@ -241,7 +276,8 @@ class API {
                 foundDevices.push({
                     name: data.description,
                     data: {
-                        id: data.device_id
+                        id: data.device_id,
+                        battery: parseFloat(data.battery.percent)
                     }
                 })
             })
@@ -266,10 +302,31 @@ class API {
                     }
                 }
                 else {
+                    var value = result.data.values.pop().value
                     this.utils.logtoall("DataCollection", "Collecting " + action)
-                    callback(null, result.data.values[0].value)
+                    this.utils.logtoall("DataCollection" , value)
+                    callback(null, value)
                 }
             })
+    }
+
+    async GetBattery(device, callback) {
+        this._Get('/devices/' + device, (error, result) => {
+            if (error) {
+                Homey.app.log(error)
+                if (error === 401) {
+                    this.authenticate((error, result) => {
+                        callback(null, this.GetValue(device, action, callback))
+                    })
+                }
+            }
+            else {
+                var value = result.data.battery.percent
+                this.utils.logtoall("DeviceCollect", "Collecting Battery")
+                this.utils.logtoall("DataCollection", value)
+                callback(null, value)
+            }
+        })
     }
 }
 module.exports = API

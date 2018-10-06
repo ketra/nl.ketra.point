@@ -46,6 +46,16 @@ class point extends Homey.Device {
                 console.log(error)
             this.setCapabilityValue('measure_noise', parseFloat(result));
         });
+        this._API.GetBattery(this.id, (error, result) => {
+            if (error)
+                console.log(error)
+            this.setCapabilityValue('measure_battery', parseFloat(result));
+        });
+        //this._API.GetValue(this.id, 'part_als', (error, result) => {
+        //    if (error)
+        //        console.log(error)
+        //    this.setCapabilityValue('measure_luminance', parseFloat(result));
+        //});
     }
 }
 module.exports = point

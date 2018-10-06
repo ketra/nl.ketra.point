@@ -62,6 +62,7 @@
         "name": "Minut Point",
         "class": "sensor",
         "capabilities": [
+          "measure_battery",
           "measure_temperature",
           "measure_humidity",
           "measure_noise",
