@@ -12,8 +12,7 @@ class point extends Homey.Device {
         this.pointhook = new Hook();
         
         this._API = new PointAPI()
-        this._API.authenticate((error, result) =>
-        { });
+        this._API.authenticate((error, result) => { });
         let data = this.getData();
         this._utils.logtoall("Init",data)
         this.id = data.id

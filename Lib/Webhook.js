@@ -32,12 +32,19 @@ class pointWebhook {
                 Homey.app.log('type: ' + args.body.event.type);
                 let device = this.findDevice(args.body.event.device_id)
                 this.SetValue(device);
+                this._flowTriggerGenericAlarm.trigger(device, {}, {});
                 switch (args.body.event.type) {
                     case "alarm_heard":
                         this._flowTriggeralarm_heard.trigger(device, {}, {})
                         break;
                     case "short_button_press":
                         this._flowTriggeralarm_Button.trigger(device, {}, {});
+                        break;
+                    case "temperature_high":
+                        this._flowTriggerTempHigh.trigger(device, { sensor_value}, {});
+                        break;
+                    case "temperature_low":
+                        this._flowTriggerTempLow.trigger(device, { sensor_value}, {});
                         break;
                     default:
                         this._flowTriggerGenericAlarm.trigger(device, {}, {});
@@ -46,9 +53,11 @@ class pointWebhook {
             })
             .register()
             .then(() => {
-                this._flowTriggerGenericAlarm = new Homey.FlowCardTriggerDevice('Generic_alarm').register();
+                this._flowTriggerGenericAlarm = new Homey.FlowCardTriggerDevice('any_alarm').register();
                 this._flowTriggeralarm_heard = new Homey.FlowCardTriggerDevice('alarm_heard').register();
                 this._flowTriggeralarm_Button = new Homey.FlowCardTriggerDevice("short_button_press").register()
+                this._flowTriggerTempHigh = new Homey.FlowCardTriggerDevice('temperature_high').register();
+                this._flowTriggerTempLow = new Homey.FlowCardTriggerDevice('temperature_low').register();
                 Homey.app.log('Webhook registered!');
             })
             .catch(this.error)

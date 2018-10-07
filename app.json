@@ -15,9 +15,155 @@
   "flow": {
     "triggers": [
       {
-        "id": "Generic_alarm",
+        "id": "short_button_press",
         "title": {
-          "en": "A generic alarm Triggered."
+          "en": "Button was pressed",
+          "nl": "De knop was ingedrukt."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
+      },
+      {
+        "id": "temperature_high",
+        "title": {
+          "en": "high temperature",
+          "nl": "hoge temperatuur"
+        },
+        "tokens": [
+          {
+            "name": "temperature",
+            "type": "number",
+            "title": {
+              "en": "Temp",
+              "nl": "Temp"
+            },
+            "example": 20.1
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
+      },
+      {
+        "id": "temperature_low",
+        "title": {
+          "en": "Low temperature",
+          "nl": "Lage temperatuur"
+        },
+        "tokens": [
+          {
+            "name": "temperature",
+            "type": "number",
+            "title": {
+              "en": "Temp",
+              "nl": "Temp"
+            },
+            "example": 20.1
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
+      },
+      {
+        "id": "temperature_normal",
+        "title": {
+          "en": "Temperature back to normal",
+          "nl": "Temperatuur terug naar normaal"
+        },
+        "tokens": [
+          {
+            "name": "temperature",
+            "type": "number",
+            "title": {
+              "en": "Temp",
+              "nl": "Temp"
+            },
+            "example": 20.1
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
+      },
+      {
+        "id": "humidity_high",
+        "title": {
+          "en": "High humidity",
+          "nl": "Hoge luchtvochtigheid"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
+      },
+      {
+        "id": "humidity_low",
+        "title": {
+          "en": "Low humidity",
+          "nl": "Lage luchtvochtigheid"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
+      },
+      {
+        "id": "humidity_normal",
+        "title": {
+          "en": "Humidity back to normal",
+          "nl": "Luchtvochtigheid terug naar normaal"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
+      },
+      {
+        "id": "device_offline",
+        "title": {
+          "en": "Device offline",
+          "nl": "Apparaat offline"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
+      },
+      {
+        "id": "device_online",
+        "title": {
+          "en": "Device online",
+          "nl": "Apparaat online"
         },
         "args": [
           {
@@ -30,7 +176,8 @@
       {
         "id": "alarm_heard",
         "title": {
-          "en": "An alarm was heard."
+          "en": "An alarm was heard.",
+          "nl": "Een alarm gehoord"
         },
         "args": [
           {
@@ -40,10 +187,11 @@
           }
         ]
       },
-      {
-        "id": "short_button_press",
+	        {
+        "id": "any_alarm",
         "title": {
-          "en": "Button was pressed"
+          "en": "an alarm was triggered",
+          "nl":  "er is een alarm"
         },
         "args": [
           {
@@ -53,7 +201,6 @@
           }
         ]
       }
-
     ]
   },
     "drivers": [
