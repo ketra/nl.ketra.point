@@ -1,4 +1,4 @@
-<h1> [WIP] Minut Point  </h1>
+<H1>Work In Progress</h1>
 
 Hello guys, I am working on an app to add support for the minut point.
 <h2>
