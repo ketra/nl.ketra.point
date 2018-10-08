@@ -6,6 +6,7 @@ Functions so far:</h2>
 <h3>
 Collection of:</h3>
 </center>
+
 *	Get temperature.
 *	Get noise
 *	Get battery
@@ -14,6 +15,7 @@ Collection of:</h3>
 <center>
 <h3>Reacting to:</h3>
 </center>
+
 *	Button press
 *	Temperature high
 *	Temperature low.
@@ -23,6 +25,7 @@ Collection of:</h3>
 
 <h3>Reacting to:</h3>
 </center>
+
 *	Alarm heard.
 *	Glassbreak
 *	Humidity high
@@ -35,6 +38,7 @@ Collection of:</h3>
 *	Tamper
 *	Battery low
 *	Battery empty.
+
 <center>
 At the moment the app will identify itself with my name upon authentication to the Minut point API I will try and change this.
 
