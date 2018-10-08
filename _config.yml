@@ -1,4 +1,2 @@
 theme: jekyll-theme-slate
-navbar-links:
-  Resources:
-    - Download app: "https://apps.athom.com/"
+title: "Homey Point Application"
