@@ -5,24 +5,24 @@ Hello guys, I am working on an app to add support for the minut point.
 Functions so far:</h2>
 <h3>
 Collection of:</h3>
-
+</center>
 *	Get temperature.
 *	Get noise
 *	Get battery
 *	Get humidity.
 *	Get pressure
-
+<center>
 <h3>Reacting to:</h3>
-
+</center>
 *	Button press
 *	Temperature high
 *	Temperature low.
 *	Temp back to normal
-
+<center>
 <h2>Todo: </h2>
 
 <h3>Reacting to:</h3>
-
+</center>
 *	Alarm heard.
 *	Glassbreak
 *	Humidity high
@@ -35,7 +35,7 @@ Collection of:</h3>
 *	Tamper
 *	Battery low
 *	Battery empty.
-
+<center>
 At the moment the app will identify itself with my name upon authentication to the Minut point API I will try and change this.
 
 i can use some help with Icons for the app. so if anyone wants to make some icons that would be great.
