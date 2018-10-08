@@ -1,4 +1,4 @@
-<H1>Work In Progress</h1>
+<center><H1>Work In Progress</h1>
 
 Hello guys, I am working on an app to add support for the minut point.
 <h2>
@@ -46,3 +46,4 @@ i can use some help with Icons for the app. so if anyone wants to make some icon
 <h4>
 <a href="https://point.ketra.nl/">Github (Work in progress)</a> <br>
 </h4>
+</center>
