@@ -1,6 +1,6 @@
 {
   "id": "com.ketra.point",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "compatibility": ">=1.5.0",
   "sdk": 2,
   "name": {
@@ -361,7 +361,15 @@
         "components": [
           {
             "id": "sensor",
-            "capabilities": [ "measure_temperature", "measure_humidity", "measure_noise", "measure_pressure", "LoudNoise", "HumAlarm", "TempAlarm" ],
+            "capabilities": [
+              "measure_temperature",
+              "measure_humidity",
+              "measure_noise",
+              "measure_pressure",
+              "LoudNoise",
+              "HumAlarm",
+              "TempAlarm"
+            ],
             "options": {
               "icons": {
                 "LoudNoise": "/drivers/Point/assets/icons/LoudNoise.png",
@@ -402,7 +410,9 @@
           },
           {
             "id": "battery",
-            "capabilities": [ "measure_battery" ]
+            "capabilities": [
+              "measure_battery"
+            ]
           }
         ]
       },
@@ -425,13 +435,13 @@
       ]
     }
   ],
-      "permissions": [],
-      "images": {
-        "large": "/assets/images/large.png",
-        "small": "/assets/images/small.png"
-      },
-      "author": {
-        "name": "Kevin Traa",
-        "email": "ketra90@gmail.com"
-      }
-    }
+  "permissions": [],
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "author": {
+    "name": "Kevin Traa",
+    "email": "ketra90@gmail.com"
+  }
+}
