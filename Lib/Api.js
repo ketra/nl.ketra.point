@@ -24,7 +24,7 @@ class API {
     async authenticate(callback) {
         try {
             clearInterval(this.OauthTimer);
-            this.OauthTimer = setInterval(this.RefreshOath.bind(this), 3600 * 100)
+            this.OauthTimer = setInterval(this.RefreshOath.bind(this), 1700 * 1000)
             axios.defaults.headers.common['Authorization'] = "Bearer " + Homey.ManagerSettings.get('access_token')
             this.RefreshOath((error, result) => { });
             callback();
@@ -292,20 +292,24 @@ class API {
     }
 
     async GetValue(device, action, callback) {
-            this._Get('/devices/' + device + '/' + action, (error, result) => {
-                if (error) {
-                    Homey.app.log(error)
-                    if (error === 401) {
-                        this.authenticate((error, result) => {
-                            callback(null, this.GetValue(device, action, callback))
-                        })
-                    }
+        let datum = new Date();
+        datum.setHours(datum.getHours()-1)
+       
+        this._Get('/devices/' + device + '/' + action + '/?start_at=' + datum.toISOString(), (error, result) => {
+            if (error) {
+                Homey.app.log(error)
+                if (error === 401) {
+                    this.authenticate((error, result) => {
+                        callback(null, this.GetValue(device, action, callback))
+                    })
                 }
-                else {
-                    var value = result.data.values.pop().value
-                    this.utils.logtoall("DataCollection", "Collecting " + action)
-                    this.utils.logtoall("DataCollection" , value)
-                    callback(null, value)
+            }
+            else {
+                //var value = result.data.values.pop()
+                var value = result.data.values[result.data.values.length - 1]
+                let collectiontime = new Date(value.datetime)
+                this.utils.logtoall("DataCollection", "Collecting " + action + " With Date " + collectiontime.toLocaleString() + " And value " + value.value)
+                callback(null, value.value);
                 }
             })
     }
@@ -321,10 +325,13 @@ class API {
                 }
             }
             else {
+                var Values = {
+                    "battery": result.data.battery.percent,
+                    "Events": result.data.ongoing_events
+                }
                 var value = result.data.battery.percent
-                this.utils.logtoall("DeviceCollect", "Collecting Battery")
-                this.utils.logtoall("DataCollection", value)
-                callback(null, value)
+                this.utils.logtoall("DeviceCollect", "Collected Battery with value " + value)
+                callback(null, Values)
             }
         })
     }

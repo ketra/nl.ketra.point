@@ -12,6 +12,32 @@
   "category": [
     "security"
   ],
+  "capabilities": {
+    "TempAlarm": {
+      "type": "boolean",
+      "title": {
+        "en": "Temperature Alarm"
+      },
+      "getable": true,
+      "setable": true
+    },
+    "HumAlarm": {
+      "type": "boolean",
+      "title": {
+        "en": "humidity Alarm"
+      },
+      "getable": true,
+      "setable": true
+    },
+    "LoudNoise": {
+      "type": "boolean",
+      "title": {
+        "en": "Loud noise"
+      },
+      "getable": true,
+      "setable": true
+    }
+  },
   "flow": {
     "triggers": [
       {
@@ -115,6 +141,17 @@
             "type": "device",
             "filter": "driver_id=Point"
           }
+        ],
+        "tokens": [
+          {
+            "name": "Humidity",
+            "type": "number",
+            "title": {
+              "en": "Humidity",
+              "nl": "Luchtvochtigheid"
+            },
+            "example": 1057.5
+          }
         ]
       },
       {
@@ -129,6 +166,17 @@
             "type": "device",
             "filter": "driver_id=Point"
           }
+        ],
+        "tokens": [
+          {
+            "name": "Humidity",
+            "type": "number",
+            "title": {
+              "en": "Humidity",
+              "nl": "Luchtvochtigheid"
+            },
+            "example": 1057.5
+          }
         ]
       },
       {
@@ -142,6 +190,67 @@
             "name": "device",
             "type": "device",
             "filter": "driver_id=Point"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "Humidity",
+            "type": "number",
+            "title": {
+              "en": "Humidity",
+              "nl": "Luchtvochtigheid"
+            },
+            "example": 1057.5
+          }
+        ]
+      },
+      {
+        "id": "avg_sound_high",
+        "title": {
+          "en": "Loud noise heard",
+          "nl": "Hard geluid gehoord"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "Sound",
+            "type": "number",
+            "title": {
+              "en": "Sound (dB)",
+              "nl": "Geluid (dB)"
+            },
+            "example": 60.5
+          }
+        ]
+      },
+      {
+        "id": "avg_sound_normal",
+        "title": {
+          "en": "Sound back to normal",
+          "nl": "Geluid terug naar normaal"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "Sound",
+            "type": "number",
+            "title": {
+              "en": "Sound (dB)",
+              "nl": "Geluid (dB)"
+            },
+            "example": 60.5
           }
         ]
       },
@@ -187,11 +296,11 @@
           }
         ]
       },
-	        {
-        "id": "any_alarm",
+      {
+        "id": "Tamper",
         "title": {
-          "en": "an alarm was triggered",
-          "nl":  "er is een alarm"
+          "en": "Tamper Alarm Triggered",
+          "nl": "Tamper beveliging afgegaan"
         },
         "args": [
           {
@@ -200,48 +309,125 @@
             "filter": "driver_id=Point"
           }
         ]
-      }
-    ]
-  },
-    "drivers": [
+      },
       {
-        "id": "Point",
-        "name": "Minut Point",
-        "class": "sensor",
-        "capabilities": [
-          "measure_battery",
-          "measure_temperature",
-          "measure_humidity",
-          "measure_noise",
-          "measure_pressure",
-          "alarm_generic"
+        "id": "any_alarm",
+        "title": {
+          "en": "an alarm was triggered",
+          "nl": "er is een alarm"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
         ],
-        "pair": [
+        "tokens": [
           {
-            "id": "login_oauth2",
-            "template": "login_oauth2"
-          },
-          {
-            "id": "list_devices",
-            "template": "list_devices_singular",
-            "navigation": {
-              "next": "add_devices"
-            }
-          },
-          {
-            "id": "add_devices",
-            "template": "add_devices"
+            "name": "Alarm",
+            "type": "string",
+            "title": {
+              "en": "Type of alarm",
+              "nl": "Type alarm"
+            },
+            "example": "Alarm_heard"
           }
         ]
       }
-    ],
-    "permissions": [],
-    "images": {
-      "large": "/assets/images/large.png",
-      "small": "/assets/images/small.png"
-    },
-    "author": {
-      "name": "kevin traa",
-      "email": "ketra90@gmail.com"
+    ]
+  },
+  "drivers": [
+    {
+      "id": "Point",
+      "name": "Minut Point",
+      "class": "sensor",
+      "capabilities": [
+        "measure_battery",
+        "measure_temperature",
+        "measure_humidity",
+        "measure_noise",
+        "measure_pressure",
+        "alarm_generic",
+        "HumAlarm",
+        "TempAlarm",
+        "LoudNoise"
+      ],
+      "mobile": {
+        "components": [
+          {
+            "id": "sensor",
+            "capabilities": [ "measure_temperature", "measure_humidity", "measure_noise", "measure_pressure", "LoudNoise", "HumAlarm", "TempAlarm" ],
+            "options": {
+              "icons": {
+                "LoudNoise": "/assets/icons/LoudNoise.png",
+                "HumAlarm": "/assets/icons/HumAlarm.png",
+                "TempAlarm":  "/assets/icons/TempAlarm.png"
+              },
+              "LoudNoise": {
+                "label": {
+                  "true": {
+                    "en": "Loud Noise Heard"
+                  },
+                  "false": {
+                    "en": "All is quiet"
+                  }
+                }
+              },
+              "HumAlarm": {
+                "label": {
+                  "true": {
+                    "en": "Abnormal Humidity"
+                  },
+                  "false": {
+                    "en": "Humidity normal"
+                  }
+                }
+              },
+              "TempAlarm": {
+                "label": {
+                  "true": {
+                    "en": "Abnormal temperature"
+                  },
+                  "false": {
+                    "en": "Normal Temp"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "battery",
+            "capabilities": [ "measure_battery" ]
+          }
+        ]
+      },
+      "pair": [
+        {
+          "id": "login_oauth2",
+          "template": "login_oauth2"
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices_singular",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ]
     }
-  }
+  ],
+      "permissions": [],
+      "images": {
+        "large": "/assets/images/large.png",
+        "small": "/assets/images/small.png"
+      },
+      "author": {
+        "name": "kevin traa",
+        "email": "ketra90@gmail.com"
+      }
+    }
