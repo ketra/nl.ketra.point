@@ -36,18 +36,25 @@ class API {
     }
     async VerifyAuth(socket, callback)
     {
-        if (Homey.ManagerSettings.get('access_token') === undefined)
-            callback(new Error("No acces_token found"));
-        else
+        try {
+            if (Homey.ManagerSettings.get('access_token') === undefined)
+                callback(new Error("No acces_token found"), null);
+            else {
+                this.RefreshOath((err, result) => {
+                    if (err) {
+                        console.log("line 45 " + err)
+                        callback(err, null);
+                    }
+                    else {
+                        socket.emit('authorized');
+                        callback(null, true);
+                    }
+                })
+            }
+        }
+        catch (err)
         {
-            this.RefreshOath((err, result) => {
-                if (err) {
-                    Homey.app.log(err)
-                    callback(err);
-                }
-                socket.emit('authorized');
-                callback(null, true);
-            })
+            callback(err, null);
         }
     }
 
@@ -55,30 +62,38 @@ class API {
         this.VerifyAuth(socket, (err, result) => {
             if (err) {
                 let authrul = this._oAuth2AuthorizationUrl + '?client_id=' + this._clientId + '&response_type=code&redirect_uri=' + this._redirectUri
-                this.utils.logtoall("Pair", "Started Pairing. on url " + authrul)
+                console.log("Started Pairing. on url " + authrul)
+                //Homey.App.log("Pair", "Started Pairing. on url " + authrul)
                 let myOAuth2Callback = new Homey.CloudOAuth2Callback(authrul)
                 myOAuth2Callback
                     .on('url', url => {
-
                         // dend the URL to the front-end to open a popup
                         socket.emit('url', url);
-
                     })
                     .on('code', code => {
-                        this.utils.logtoall("Pair", "Received Code " + code)
-                        this.authorize(code).then(function () {
-                            this.utils.logtoall("Startauth", "Authenticated succesfully")
-                            socket.emit('authorized');
-                        }).catch(function (err) {
-                            this.utils.logtoall("Pair", "Error Received on Pair: " + err)
-                            socket.emit('error', err);
+                        this.utils.logtoall("code","Received Code " + code)
+                        this.authorize(code, (err, result) => {
+                            if (err) {
+                                console.log(err)
+                                this.utils.logtoall("Pair", "Error Received on Pair: " + err)
+                                socket.emit('error', err);
+                            }
+                            else {
+                                this.utils.logtoall("Startauth", "Authenticated succesfully")
+                                socket.emit('authorized');
+                            }
                         })
                     })
                     .generate()
                     .catch(err => {
+                        console.log(err)
                         this.utils.logtoall("Pair", "Error Received on Pair: " + err)
                         socket.emit('error', err);
                     })
+                socket.on('list_devices', (data, callback) => {
+                    this.utils.logtoall("Oauth process", "Setup ListDevices")
+                    this.GetDevices(callback);
+                })
             }
             else {
                 socket.on('list_devices', (data, callback) => {
@@ -95,11 +110,12 @@ class API {
         axios.get(url).then(function (result) {
             callback(null,result)
         }).catch(function (err) {
-            Homey.app.log(err)
+            //Homey.app.log(err)
             if (err.response.status === 401)
             {
                 callback(401, null)
             }
+            callback(err,null)
         })
     }
 
@@ -112,6 +128,7 @@ class API {
             if (err.response.status === 401) {
                 callback(401, null)
             }
+            callback(err, null);
         })
     }
 
@@ -135,8 +152,11 @@ class API {
     async SetWebhook(callback)
     {
         this.CheckWebhook((error, result) => {
-            if (result)
+            if (result) {
+                Homey.app.log("Already found webhook with id " + result.id);
                 callback(null, result);
+                return;
+            }
             let data = {
                 "url": Homey.env.WEBHOOK_URL,
                 "events": ["alarm_heard",
@@ -165,12 +185,14 @@ class API {
                             if (error === 401) {
                                 this.authenticate((error, result) => {
                                     callback(null, this.SetWebhook(callback))
+                                    return
                                 })
                             }
                             else
                                 callback(error, null)
                         }
                         else {
+                            Homey.app.log("Registered webhook with id " + result.hook_id)
                             callback(null, result);
                         }
                     })
@@ -182,18 +204,27 @@ class API {
     CheckWebhook(callback) {
         this.GetWekhook((err, result) => {
             var found;
-            for (var i = 0; i < result.length; i++) {
-                if (result[i].url == Homey.env.WEBHOOK_URL) {
-                    found = result[i];
-                    break;
+            if (result) {
+                for (var i = 0; i < result.length; i++) {
+                    if (result[i].url == Homey.env.WEBHOOK_URL) {
+                        found = result[i];
+                        break;
+                    }
                 }
+                if (found)
+                    callback(null, found);
+                else
+                    callback(new Error("No Hooks found"),null)
             }
-            callback(null, found);
+            else
+            {
+                callback(err,null );
+            }
         })
     }
 
     async GetWekhook(callback) {
-        this.utils.logtoall("Webhook", "Collecting Webhookds")
+        this.utils.logtoall("Webhook", "Collecting Webhooks")
         let url = '/webhooks'
         let options = {
             baseURL: 'https://api.minut.com/draft1/',
@@ -202,7 +233,7 @@ class API {
         }
         this._GetOptions(options, (err, result) => {
             if (err) {
-                Homey.app.log(err)
+                //Homey.app.log(err)
                 if (typeof callback === "function")
                     callback(err)
             }
@@ -225,9 +256,10 @@ class API {
         }
         this._GetOptions(options, (err, result) => {
             if (err) {
-                Homey.app.log(err)
+                //Homey.App.log(err)
                 if (typeof callback === "function")
-                    callback(err)
+                    callback(err, null)
+                return;
             }
             this.utils.logtoall("Refresh Auth", "Received access_token" + result.data.access_token)
             this.utils.logtoall("Refresh Auth", "Received refresh_token" + result.data.refresh_token)
@@ -240,7 +272,7 @@ class API {
 
     }
 
-    async authorize(code) {
+    async authorize(code, callback) {
         let url = '/oauth/token'
         let options = {
             method: 'GET',
@@ -254,14 +286,15 @@ class API {
         }
         this._GetOptions(options, (err, result) => {
             if (err) {
-                Promise.reject(err)
-                Homey.app.log(err)
+                callback(err, null)
+                //Homey.app.log(err)
             }
-            Homey.ManagerSettings.set('access_token', postdata.data.access_token)
-            Homey.ManagerSettings.set('refresh_token', postdata.data.refresh_token)
-            this.utils.logtoall("Token", "Received token: " + postdata.data.access_token)
-            axios.defaults.headers.common['Authorization'] = "Bearer " + postdata.data.access_token
+            Homey.ManagerSettings.set('access_token', result.data.access_token)
+            Homey.ManagerSettings.set('refresh_token', result.data.refresh_token)
+            this.utils.logtoall("Token", "Received token: " + result.data.access_token)
+            axios.defaults.headers.common['Authorization'] = "Bearer " + result.data.access_token
             setInterval(this.RefreshOath.bind(this), 3600 * 1000)
+            callback(null,null);
         //console.log(postdata.data);
         })
     }
@@ -281,7 +314,7 @@ class API {
                     }
                 })
             })
-            Homey.app.log(error)
+            //Homey.app.log(error)
             callback(null, foundDevices)
             return this._onPairListDevices(foundDevices)
         })
@@ -317,7 +350,7 @@ class API {
     async GetBattery(device, callback) {
         this._Get('/devices/' + device, (error, result) => {
             if (error) {
-                Homey.app.log(error)
+                //Homey.app.log(error)
                 if (error === 401) {
                     this.authenticate((error, result) => {
                         callback(null, this.GetValue(device, action, callback))

@@ -20,29 +20,7 @@ class Point extends Homey.Driver  {
 
     }
     onInit() {
-        let API = new PointAPI()
-        let pointhook = new Hook();
-        if (!Homey.ManagerSettings.get('hook_id'))
-            API.SetWebhook((error, result) => {
-                
-                if (error) {
-                    console.log(error)
-                }
-                else {
 
-                    Homey.app.log("Registered Webhook with id " + result.hook_id)
-                    if (result.hook_id) {
-                        Homey.ManagerSettings.set('hook_id', result.hook_id)
-                        pointhook.RegisterWebhook(result.hook_id)
-                    }
-                }
-            })
-        else
-        {
-            Homey.app.log("Hookid found: " +  Homey.ManagerSettings.get('hook_id'));
-            pointhook.RegisterWebhook(Homey.ManagerSettings.get('hook_id'))
-
-        }
     }
 
 }
