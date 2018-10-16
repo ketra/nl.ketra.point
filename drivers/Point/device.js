@@ -8,6 +8,8 @@ const POLL_INTERVAL = 60 * 1000;
 class point extends Homey.Device {
 
     onInit() {
+        if (!Homey.app.webhook)
+            Homey.app.CreateWebhook();
         this._utils = new utils();
         this.pointhook = new Hook();
         

@@ -12,7 +12,7 @@ class pointWebhook {
     AddDevice(device)
     {
         devices.push(device);
-        console.log(devices)
+       // console.log(devices)
     }
 
     //Function to remove device from array to no longer trigger webhook for device.
@@ -138,6 +138,7 @@ class pointWebhook {
                 this._flowTriggeralarm_Soundnormal = new Homey.FlowCardTriggerDevice("avg_sound_normal").register();
                 this._flowTriggeralarm_Tamper = new Homey.FlowCardTriggerDevice("Tamper").register();
                 Homey.app.log('Webhook registered!');
+                return this.myWebhook;
             })
             .catch(function (error) {
                 Homey.app.log(error);
