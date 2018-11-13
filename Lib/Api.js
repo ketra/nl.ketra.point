@@ -1,7 +1,8 @@
 'use strict';
 
 const Homey = require('homey');
-const axios = require('axios');
+//const axios = require('axios');
+const phin = require('phin').unpromisified
 const util = require('../../Lib/utils')
 
 class API {
@@ -15,17 +16,25 @@ class API {
         this._apiUrl = `https://api.minut.com/v1/`;
         this._redirectUri = 'https://callback.athom.com/oauth2/callback';
         this._token = null;
-        axios.defaults.baseURL = 'https://api.minut.com/v1/';
         this.utils = new util();
         this._authenticated = false;
         this.OauthTimer;
+        this.options = {}
+        this.baseURL = 'https://api.minut.com/v1'
+        this.options.headers = {}
+    }
+
+    GetUrl(url)
+    {
+      return this.baseURL + url
     }
 
     async authenticate(callback) {
         try {
             clearInterval(this.OauthTimer);
             this.OauthTimer = setInterval(this.RefreshOath.bind(this), 1700 * 1000)
-            axios.defaults.headers.common['Authorization'] = "Bearer " + Homey.ManagerSettings.get('access_token')
+            //axios.defaults.headers.common['Authorization'] = "Bearer "
+            this.setHeader(Homey.ManagerSettings.get('access_token'))
             this.RefreshOath((error, result) => { });
             callback();
         }
@@ -105,48 +114,66 @@ class API {
 
 
     }
+    setHeader(token) {
+        if (token) {
+            var headers = { authorization: "bearer " + token }
+            this.options.headers = headers;
+        }
+    }
+
+    getUrl(url) {
+        return this.baseURL + url
+    }
+
     async _Get(url, callback) {
-        this.utils.logtoall("_GET", "Getting details from " + url)
-        axios.get(url).then(function (result) {
-            callback(null,result)
-        }).catch(function (err) {
-            //Homey.app.log(err)
-            if (err.response.status === 401)
-            {
-                callback(401, null)
-            }
-            callback(err,null)
-        })
+        try {
+            var options = this.options;
+            options.url = this.getUrl(url);
+            //console.log(options);
+            phin(options, (err, res) => {
+                if (!err) { callback(null, JSON.parse(res.body.toString('utf8'))) }
+                else { console.log(err.body); callback(err, null) }
+            })
+        }
+        catch (err) {
+            console.log(err);
+        }
     }
-
-    async _GetOptions(options, callback)
-    {
-        axios(options).then(function (result) {
-            callback(null,result)
-        }).catch(function (err) {
-            Homey.app.log(err)
-            if (err.response.status === 401) {
-                callback(401, null)
-            }
-            callback(err, null);
-        })
+    async _GetOptions(options, headers, callback) {
+        if (headers) {
+            options.headers = {}
+            options.headers.authorization = this.options.headers.authorization
+        }
+        console.log(options);
+        try {
+            phin(options, (err, res) => {
+                if (!err) { console.log(res.body.toString()); callback(null, res.body.toString('utf8')) }
+                else { console.log(err); callback(err, null) }
+            })
+        }
+        catch (err)
+        {
+            console.log(err);
+        }
     }
-
-    async _Post(url, data, callback)
-    {
+    async _Post(url, data, callback) {
         this.utils.logtoall("_POST", "Posting Data" + data)
+        this.utils.logtoall("_POST", "Posting Data")
         //console.log(data)
-        axios.post(url, data, {
-            baseURL: 'https://api.minut.com/draft1/'
-        }).then(function (response) {
-            callback(null,response.data)
-        }).catch(function (err) {
-            console.log(err)
-            if (err.response.status === 401) {
-                callback(401, null)
-            }
-            callback(err,null)
-        });
+        var options = this.options
+        options.url = this.getUrl(url)
+        options.data = data
+        options.method = "POST"
+        //console.log(options);
+        try {
+        phin(options, (err, res) => {
+            if (!err) {callback(null, JSON.parse(res.body.toString('utf8'))) }
+            else { console.log(err); callback(err, null) }
+        })
+    }
+    catch(err) {
+        console.log(err);
+    }
     }
 
     async SetWebhook(callback)
@@ -226,25 +253,24 @@ class API {
 
     async GetWekhook(callback) {
         this.utils.logtoall("Webhook", "Collecting Webhooks")
-        let url = '/webhooks'
+        let url = this.getUrl('/webhooks')
         let options = {
-            baseURL: 'https://api.minut.com/draft1/',
             method: 'GET',
             url
         }
-        this._GetOptions(options, (err, result) => {
+        this._GetOptions(options, true, (err, result) => {
             if (err) {
                 //Homey.app.log(err)
                 if (typeof callback === "function")
                     callback(err)
             }
-            callback(null, result.data.hooks);
+            callback(null, result.hooks);
         });
     }
 
     async RefreshOath(callback) {
         this.utils.logtoall("Refresh Auth", "Refresing Oath Token.")
-        let url = '/oauth/token'
+        let url = this.getUrl('/oauth/token')
         let options = {
             method: 'GET',
             data: {
@@ -255,18 +281,20 @@ class API {
                 grant_type: "refresh_token"
             }, url
         }
-        this._GetOptions(options, (err, result) => {
+        this._GetOptions(options, false, (err, result) => {
+            console.log(result)
             if (err) {
                 //Homey.App.log(err)
                 if (typeof callback === "function")
                     callback(err, null)
                 return;
             }
-            this.utils.logtoall("Refresh Auth", "Received access_token" + result.data.access_token)
-            this.utils.logtoall("Refresh Auth", "Received refresh_token" + result.data.refresh_token)
-            axios.defaults.headers.common['Authorization'] = "Bearer " + Homey.ManagerSettings.get('access_token')
-            Homey.ManagerSettings.set('access_token', result.data.access_token)
-            Homey.ManagerSettings.set('refresh_token', result.data.refresh_token)
+            this.utils.logtoall("Refresh Auth", "Received access_token" + result.access_token)
+            this.utils.logtoall("Refresh Auth", "Received refresh_token" + result.refresh_token)
+            //axios.defaults.headers.common['Authorization'] = "Bearer " + 
+            this.setHeader(Homey.ManagerSettings.get('access_token'))
+            Homey.ManagerSettings.set('access_token', result.access_token)
+            Homey.ManagerSettings.set('refresh_token', result.refresh_token)
             if (typeof callback === "function")
                 callback(null,"")
         })
@@ -274,30 +302,38 @@ class API {
     }
 
     async authorize(code, callback) {
-        let url = '/oauth/token'
-        let options = {
-            method: 'GET',
-            data: {
-                redirect_uri: this._redirectUri,
-                client_id: this._clientId,
-                client_secret: this._clientSecret,
-                code: code,
-                grant_type: "authorization_code"
-            }, url
-        }
-        this._GetOptions(options, (err, result) => {
-            if (err) {
-                callback(err, null)
-                //Homey.app.log(err)
+        try {
+            let url = this.getUrl('/oauth/token')
+            let options = {
+                method: 'GET',
+                data: {
+                    redirect_uri: this._redirectUri,
+                    client_id: this._clientId,
+                    client_secret: this._clientSecret,
+                    code: code,
+                    grant_type: "authorization_code"
+                }, url
             }
-            Homey.ManagerSettings.set('access_token', result.data.access_token)
-            Homey.ManagerSettings.set('refresh_token', result.data.refresh_token)
-            this.utils.logtoall("Token", "Received token: " + result.data.access_token)
-            axios.defaults.headers.common['Authorization'] = "Bearer " + result.data.access_token
-            setInterval(this.RefreshOath.bind(this), 3600 * 1000)
-            callback(null,null);
-        //console.log(postdata.data);
-        })
+            this._GetOptions(options, false, (err, result) => {
+                if (err) {
+                    callback(err, null)
+                    //Homey.app.log(err)
+                }
+                console.log(result)
+                Homey.ManagerSettings.set('access_token', result.access_token)
+                Homey.ManagerSettings.set('refresh_token', result.refresh_token)
+                this.utils.logtoall("Token", "Received token: " + result.access_token)
+                this.setHeader(result.access_token)
+                //axios.defaults.headers.common['Authorization'] = "Bearer " + result.data.access_token
+                setInterval(this.RefreshOath.bind(this), 3600 * 1000)
+                callback(null, null);
+                //console.log(postdata.data);
+            })
+        }
+        catch (err)
+        {
+            callback(err, null);
+        }
     }
 
     async GetDevices(callback) {
@@ -306,7 +342,7 @@ class API {
             this.utils.logtoall("ListDevices ", result.data)
             if (error)
                 callback(error)
-            result.data.devices.forEach((data) => {
+            result.devices.forEach((data) => {
                 foundDevices.push({
                     name: data.description,
                     data: {
@@ -328,7 +364,7 @@ class API {
     async GetValue(device, action, callback) {
         let datum = new Date();
         datum.setHours(datum.getHours()-1)
-       
+
         this._Get('/devices/' + device + '/' + action + '/?start_at=' + datum.toISOString(), (error, result) => {
             if (error) {
                 Homey.app.log(error)
@@ -340,7 +376,8 @@ class API {
             }
             else {
                 //var value = result.data.values.pop()
-                var value = result.data.values[result.data.values.length - 1]
+                //console.log(result)
+                var value = result.values[result.values.length - 1]
                 let collectiontime = new Date(value.datetime)
                 this.utils.logtoall("DataCollection", "Collecting " + action + " With Date " + collectiontime.toLocaleString() + " And value " + value.value)
                 callback(null, value.value);
@@ -350,6 +387,7 @@ class API {
 
     async GetBattery(device, callback) {
         this._Get('/devices/' + device, (error, result) => {
+            //console.log(error)
             if (error) {
                 //Homey.app.log(error)
                 if (error === 401) {
@@ -359,11 +397,12 @@ class API {
                 }
             }
             else {
+                //console.log(result)
                 var Values = {
-                    "battery": result.data.battery.percent,
-                    "Events": result.data.ongoing_events
+                    "battery": result.battery.percent,
+                    "Events": result.ongoing_events
                 }
-                var value = result.data.battery.percent
+                var value = result.battery.percent
                 this.utils.logtoall("DeviceCollect", "Collected Battery with value " + value)
                 callback(null, Values)
             }
