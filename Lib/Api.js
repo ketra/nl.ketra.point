@@ -160,6 +160,7 @@ class API {
             let data = {
                 "url": Homey.env.WEBHOOK_URL,
                 "events": ["alarm_heard",
+                    "glassbreak",
                     "short_button_press",
                     "temperature_high",
                     "temperature_low",
