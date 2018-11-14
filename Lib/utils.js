@@ -1,7 +1,7 @@
 'use strict';
 
 const Homey = require('homey');
-const axios = require('axios')
+//const axios = require('axios')
 
 class util {
 
