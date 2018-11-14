@@ -2,7 +2,7 @@
 
 const Homey = require('homey');
 //const axios = require('axios');
-const phin = require('phin').unpromisified
+const phin = require('phin')
 const util = require('../../Lib/utils')
 
 class API {
@@ -35,6 +35,7 @@ class API {
             this.OauthTimer = setInterval(this.RefreshOath.bind(this), 1700 * 1000)
             //axios.defaults.headers.common['Authorization'] = "Bearer "
             this.setHeader(Homey.ManagerSettings.get('access_token'))
+            if (this.getSecondsBetweenDates(Homey.ManagerSettings.get('Refreshtimer')) > 600) return;
             this.RefreshOath((error, result) => { });
             callback();
         }
@@ -43,6 +44,16 @@ class API {
             console.log(err)
         }
     }
+
+    getSecondsBetweenDates(startDate) {
+        var d = new Date()
+        if (!startDate) return 0;
+        //console.log('Checking : '+ startDate + ' Against : ' + endDate)¡
+        var diff = startDate.getTime() - d.getTime();
+        diff = diff / 1000
+        return Math.round(diff);
+    }
+
     async VerifyAuth(socket, callback)
     {
         try {
@@ -129,10 +140,17 @@ class API {
         try {
             var options = this.options;
             options.url = this.getUrl(url);
+            options.parse = 'json'
             //console.log(options);
-            phin(options, (err, res) => {
-                if (!err) { callback(null, JSON.parse(res.body.toString('utf8'))) }
-                else { console.log(err.body); callback(err, null) }
+            phin(options).then(function (result) {
+                //console.log(result.body)
+                callback(null, result.body)
+            }).catch(function (err) {
+                //Homey.app.log(err)
+                //if (err.response.status === 401) {
+                //    callback(401, null)
+                //}
+                callback(err, null)
             })
         }
         catch (err) {
@@ -140,15 +158,24 @@ class API {
         }
     }
     async _GetOptions(options, headers, callback) {
+        options.headers = {
+            "Content-Type": "application/json", "Cache-Control": "no-cache" };
         if (headers) {
-            options.headers = {}
+            
             options.headers.authorization = this.options.headers.authorization
         }
+        options.parse = 'json'
         console.log(options);
         try {
-            phin(options, (err, res) => {
-                if (!err) { console.log(res.body.toString()); callback(null, res.body.toString('utf8')) }
-                else { console.log(err); callback(err, null) }
+            phin(options).then(function (result) {
+                //console.log(result.body)
+                callback(null, result.body)
+            }).catch(function (err) {
+                //Homey.app.log(err)
+                //if (err.response.status === 401) {
+                //    callback(401, null)
+                //}
+                callback(err, null)
             })
         }
         catch (err)
@@ -162,15 +189,22 @@ class API {
         //console.log(data)
         var options = this.options
         options.url = this.getUrl(url)
+        options.parse = 'json'
         options.data = data
         options.method = "POST"
         //console.log(options);
         try {
-        phin(options, (err, res) => {
-            if (!err) {callback(null, JSON.parse(res.body.toString('utf8'))) }
-            else { console.log(err); callback(err, null) }
-        })
-    }
+            phin(options).then(function (result) {
+                //console.log(result.body)
+                callback(null, result.body)
+            }).catch(function (err) {
+                //Homey.app.log(err)
+                if (err.response.status === 401) {
+                    callback(401, null)
+                }
+                callback(err, null)
+            })
+        }
     catch(err) {
         console.log(err);
     }
@@ -212,6 +246,7 @@ class API {
                         if (error) {
                             if (error === 401) {
                                 this.authenticate((error, result) => {
+                                    Homey.app.log("Authentication Needed")
                                     callback(null, this.SetWebhook(callback))
                                     return
                                 })
@@ -231,11 +266,16 @@ class API {
 
     CheckWebhook(callback) {
         this.GetWekhook((err, result) => {
+            if (err)
+            {
+                callback(err, null);
+                return
+            }
             var found;
             if (result) {
-                for (var i = 0; i < result.length; i++) {
-                    if (result[i].url == Homey.env.WEBHOOK_URL) {
-                        found = result[i];
+                for (var i = 0; i < result.hooks.length; i++) {
+                    if (result.hooks[i].url == Homey.env.WEBHOOK_URL) {
+                        found = result.hooks[i];
                         break;
                     }
                 }
@@ -243,10 +283,6 @@ class API {
                     callback(null, found);
                 else
                     callback(new Error("No Hooks found"),null)
-            }
-            else
-            {
-                callback(err,null );
             }
         })
     }
@@ -264,12 +300,21 @@ class API {
                 if (typeof callback === "function")
                     callback(err)
             }
-            callback(null, result.hooks);
+            try {
+                var hooks = result.hooks;
+                callback(null, result.hooks);
+            }
+            catch (err)
+            {
+                callback("error", null);
+            }
         });
     }
 
     async RefreshOath(callback) {
         this.utils.logtoall("Refresh Auth", "Refresing Oath Token.")
+        var refreshtoken = Homey.ManagerSettings.get('refresh_token')
+        if (refreshtoken == null) { callback("error", null); return}
         let url = this.getUrl('/oauth/token')
         let options = {
             method: 'GET',
@@ -277,12 +322,12 @@ class API {
                 redirect_uri: this._redirectUri,
                 client_id: this._clientId,
                 client_secret: this._clientSecret,
-                refresh_token: Homey.ManagerSettings.get('refresh_token'),
+                refresh_token: refreshtoken,
                 grant_type: "refresh_token"
             }, url
         }
         this._GetOptions(options, false, (err, result) => {
-            console.log(result)
+            //console.log(result)
             if (err) {
                 //Homey.App.log(err)
                 if (typeof callback === "function")
@@ -295,6 +340,9 @@ class API {
             this.setHeader(Homey.ManagerSettings.get('access_token'))
             Homey.ManagerSettings.set('access_token', result.access_token)
             Homey.ManagerSettings.set('refresh_token', result.refresh_token)
+            let datum = new Date();
+            datum.setSeconds(datum.getSeconds + 3600)
+            Homey.ManagerSettings.set('Refreshtimer', datum)
             if (typeof callback === "function")
                 callback(null,"")
         })
@@ -302,10 +350,11 @@ class API {
     }
 
     async authorize(code, callback) {
+        if (Homey.ManagerSettings.get('access_token') != undefined) return;
         try {
             let url = this.getUrl('/oauth/token')
             let options = {
-                method: 'GET',
+                method: 'POST',
                 data: {
                     redirect_uri: this._redirectUri,
                     client_id: this._clientId,
@@ -319,7 +368,7 @@ class API {
                     callback(err, null)
                     //Homey.app.log(err)
                 }
-                console.log(result)
+                //console.log(result)
                 Homey.ManagerSettings.set('access_token', result.access_token)
                 Homey.ManagerSettings.set('refresh_token', result.refresh_token)
                 this.utils.logtoall("Token", "Received token: " + result.access_token)
