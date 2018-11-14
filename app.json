@@ -1,6 +1,6 @@
 {
   "id": "com.ketra.point",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "compatibility": ">=1.5.0",
   "sdk": 2,
   "name": {
