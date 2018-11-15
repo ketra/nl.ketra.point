@@ -1,5 +1,5 @@
 const Homey = require('homey'); 
-const API = require('./Api')
+const API = require('./Api');
 
 let id = Homey.env.WEBHOOK_ID;
 let secret = Homey.env.WEBHOOK_SECRET;
@@ -12,16 +12,16 @@ class pointWebhook {
     AddDevice(device)
     {
         devices.push(device);
-       // console.log(devices)
+        console.log(devices)
     }
 
     //Function to remove device from array to no longer trigger webhook for device.
     RemoveDevice(device)
     {
         devices = devices.filter(function (item) {
-            return item !== device
-        })
-        console.log(devices)
+            return item !== device;
+        });
+        console.log(devices);
     }
     //Register the webhook.
     RegisterWebhook(data) {
@@ -34,13 +34,14 @@ class pointWebhook {
                     Homey.app.log('ID:' + args.body.event.id);
                     Homey.app.log('Created At: ' + args.body.event.created_at);
                     Homey.app.log('type: ' + args.body.event.type);
-                    let device = this.findDevice(args.body.event.device_id)
+                    Homey.app.log('Device: ' + args.body.event.device_id)
+                    let device = this.findDevice(args.body.event.device_id);
                     if (!device) {
-                        Homey.app.log("device undefinded?")
+                        Homey.app.log("device undefinded?");
                         return;
                     }
                     let eventtype = args.body.event.type;
-                    Homey.app.log(eventtype)
+                    Homey.app.log(eventtype);
                     //this.SetValue(device);
                     this._flowTriggerGenericAlarm.trigger(device, { "Alarm": eventtype }, {});
                     switch (eventtype) {
@@ -125,7 +126,7 @@ class pointWebhook {
                 //register all flows to be allowed to trigger.
                 this._flowTriggerGenericAlarm = new Homey.FlowCardTriggerDevice('any_alarm').register();
                 this._flowTriggeralarm_heard = new Homey.FlowCardTriggerDevice('alarm_heard').register();
-                this._flowTriggeralarm_Button = new Homey.FlowCardTriggerDevice("short_button_press").register()
+                this._flowTriggeralarm_Button = new Homey.FlowCardTriggerDevice("short_button_press").register();
                 this._flowTriggerTempHigh = new Homey.FlowCardTriggerDevice('temperature_high').register();
                 this._flowTriggerTempLow = new Homey.FlowCardTriggerDevice('temperature_low').register();
                 this._flowTriggerTempnormal = new Homey.FlowCardTriggerDevice('temperature_normal').register();
@@ -150,7 +151,7 @@ class pointWebhook {
     {
         clearTimeout(generictimeout);
         device.setCapabilityValue("alarm_generic", true);
-        generictimeout = setTimeout(() => { device.setCapabilityValue("alarm_generic", false) }, 30000);
+        generictimeout = setTimeout(() => { device.setCapabilityValue("alarm_generic", false); }, 30000);
     }
     //find device in array.
     findDevice(deviceid)
