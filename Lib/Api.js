@@ -87,49 +87,52 @@ class API {
         }
     }
 
-    async startOath(socket) {
+    async startOath(socket, callback) {
         this.VerifyAuth(socket, (err, result) => {
-            if (err) {
-                let authrul = this._oAuth2AuthorizationUrl + '?client_id=' + this._clientId + '&response_type=code&redirect_uri=' + this._redirectUri;
-                console.log("Started Pairing. on url " + authrul);
-                //Homey.App.log("Pair", "Started Pairing. on url " + authrul)
-                let myOAuth2Callback = new Homey.CloudOAuth2Callback(authrul);
-                myOAuth2Callback
-                    .on('url', url => {
-                        // dend the URL to the front-end to open a popup
-                        socket.emit('url', url);
-                    })
-                    .on('code', code => {
-                        this.utils.logtoall("code", "Received Code " + code);
-                        this.authorize(code, (err, result) => {
-                            if (err) {
-                                console.log(err);
-                                this.utils.logtoall("Pair", "Error Received on Pair: " + err);
-                                socket.emit('error', err);
-                            }
-                            else {
-                                this.utils.logtoall("Startauth", "Authenticated succesfully");
-                                socket.emit('authorized');
-                            }
-                        });
-                    })
-                    .generate()
-                    .catch(err => {
-                        console.log(err);
-                        this.utils.logtoall("Pair", "Error Received on Pair: " + err);
-                        socket.emit('error', err);
-                    });
-                socket.on('list_devices', (data, callback) => {
-                    this.utils.logtoall("Oauth process", "Setup ListDevices");
-                    this.GetDevices(callback);
+            //if (err) {
+            let authrul = this._oAuth2AuthorizationUrl + '?client_id=' + this._clientId + '&response_type=code&redirect_uri=' + this._redirectUri;
+            console.log("Started Pairing. on url " + authrul);
+            //Homey.App.log("Pair", "Started Pairing. on url " + authrul)
+            let myOAuth2Callback = new Homey.CloudOAuth2Callback(authrul);
+            myOAuth2Callback
+                .on('url', url => {
+                    // dend the URL to the front-end to open a popup
+                    socket.emit('url', url);
                 })
-            }
-            else {
-                socket.on('list_devices', (data, callback) => {
-                    this.utils.logtoall("Oauth process", "Setup ListDevices");
-                    this.GetDevices(callback);
+                .on('code', code => {
+                    this.utils.logtoall("code", "Received Code " + code);
+                    this.authorize(code, (err, result) => {
+                        if (err) {
+                            console.log(err);
+                            this.utils.logtoall("Pair", "Error Received on Pair: " + err);
+                            socket.emit('error', err);
+                        }
+                        else {
+                            this.utils.logtoall("Startauth", "Authenticated succesfully");
+                            socket.emit('authorized');
+                        }
+                    });
+                })
+                .generate()
+                .catch(err => {
+                    console.log(err);
+                    this.utils.logtoall("Pair", "Error Received on Pair: " + err);
+                    socket.emit('error', err);
                 });
-            }
+            //socket.on('list_devices', (data, callback) => {
+            //    this.utils.logtoall("Oauth process", "Setup ListDevices");
+            //    this.GetDevices(callback);
+        //});
+                callback();
+                
+            //}
+            //else {
+            //    socket.emit('authorized');
+            //    socket.on('list_devices', (data, callback) => {
+            //        this.utils.logtoall("Oauth process", "Setup ListDevices");
+            //        this.GetDevices(callback);
+            //    });
+            //}
         });
 
 
@@ -220,9 +223,38 @@ class API {
                 callback(err, null);
             });
         }
-    catch(err) {
-        console.log(err);
+        catch (err) {
+            callback(err,null)
+            console.log(err);
+        }
     }
+
+    async _Put(url, data, callback) {
+        //this.utils.logtoall("_POST", "Posting Data" + data);
+        //this.utils.logtoall("_POST", "Posting Data");
+        //console.log(data)
+        var options = this.options;
+        options.url = this.getUrl(url);
+        options.parse = "JSON";
+        options.data = data;
+        options.method = "PUT";
+        //console.log(options);
+        try {
+            phin(options).then(function (result) {
+                //console.log(result.body);
+                callback(null, result.body);
+            }).catch(function (err) {
+                Homey.app.log(err);
+                if (err.response.status === 401) {
+                    callback(401, null);
+                }
+                callback(err, null);
+            });
+        }
+        catch (err) {
+            callback(err, null)
+            console.log(err);
+        }
     }
 
     SetWebhook(callback)
@@ -431,6 +463,26 @@ async GetDevices(callback) {
         return this._onPairListDevices(foundDevices)
     });
 }
+async GetHomes(callback) {
+    let foundDevices = []
+    this._Get('/homes', (error, result) => {
+        this.utils.logtoall("ListHomes ", result)
+        console.log(result)
+        if (error)
+            callback(error);
+        result.homes.forEach((data) => {
+            foundDevices.push({
+                name: data.name,
+                data: {
+                    id: data.home_id
+                }
+            })
+        })
+        //Homey.app.log(error)
+        callback(null, foundDevices)
+        return this._onPairListDevices(foundDevices)
+    });
+}
 
     async _onPairListDevices(result) {
         return [];
@@ -459,6 +511,35 @@ async GetDevices(callback) {
                 }
             })
     }
+    async GetHomeAlarm(home, callback) {
+        this._Get('/homes/' + home, (error, result) => {
+            //console.log(error)
+            if (error) {
+                //Homey.app.log(error)
+                if (error === 401) {
+                    this.authenticate((error, result) => {
+                        callback(null, this.GetHomeDetails(home, action, callback))
+                    })
+                }
+            }
+            else {
+                try {
+                    //console.log(result.alarm_status)
+                    if (result.alarm_status == "off")
+                        var alarm_status = false;
+                    else
+                        var alarm_status = true;
+                    this.utils.logtoall("HomeCollection", "Collecting alarm state:" + alarm_status);
+                    callback(null, alarm_status);
+                }
+                catch (err)
+                {
+                    callback(err, null);
+                }
+            }
+        })
+    }
+
 
     async GetBattery(device, callback) {
         this._Get('/devices/' + device, (error, result) => {
@@ -481,6 +562,17 @@ async GetDevices(callback) {
                 this.utils.logtoall("DeviceCollect", "Collected Battery with value " + value)
                 callback(null, Values)
             }
+        })
+    }
+    async SetAlarmStatus(home, status, callback)
+    {
+        let data = {
+            "alarm_status": status
+        };
+        this._Put("/homes/" + home + "/alarm", data, (err, result) => {
+            if(err)
+                console.log(error)
+            callback();
         })
     }
 }

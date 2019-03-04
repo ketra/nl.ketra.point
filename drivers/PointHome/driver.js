@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const Homey = require('homey');
 const util = require('../../Lib/utils')
@@ -14,7 +14,7 @@ class Point extends Homey.Driver  {
                 API.startOath(socket, (err, result) => {
                     socket.on('list_devices', (data, callback) => {
                         this.utils.logtoall("Oauth process", "Setup ListDevices");
-                        API.GetDevices(callback);
+                        API.GetHomes(callback);
                     });
                 });
             }

@@ -39,6 +39,36 @@
     }
   },
   "flow": {
+    "actions": [
+      {
+        "id": "set_alarm_on",
+        "title": {
+          "en": "Alarm ON",
+          "nl": "Alarm Aan"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=PointHome"
+          }
+        ]
+      },
+      {
+        "id": "set_alarm_off",
+        "title": {
+          "en": "Alarm Off",
+          "nl": "Alarm uit"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=PointHome"
+          }
+        ]
+      }
+    ],
     "triggers": [
       {
         "id": "short_button_press",
@@ -415,6 +445,35 @@
             ]
           }
         ]
+      },
+      "pair": [
+        {
+          "id": "login_oauth2",
+          "template": "login_oauth2"
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices_singular",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ]
+    },
+    {
+      "id": "PointHome",
+      "name": "Point Home",
+      "class": "homealarm",
+      "capabilities": [
+        "alarm_generic"
+      ],
+      "images": {
+        "large": "/drivers/Point/assets/images/large.png",
+        "small": "/drivers/Point/assets/images/small.png"
       },
       "pair": [
         {
