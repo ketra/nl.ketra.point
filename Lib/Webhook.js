@@ -36,6 +36,7 @@ class pointWebhook {
                     Homey.app.log('type: ' + args.body.event.type);
                     Homey.app.log('Device: ' + args.body.event.device_id)
                     let device = this.findDevice(args.body.event.device_id);
+                    let sensor_value = args.body.event.sensor_value;
                     if (!device) {
                         Homey.app.log("device undefinded?");
                         return;

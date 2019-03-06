@@ -30,6 +30,18 @@ class PointHome extends OAuth2Device {
             fn: this.oauth2Account.refreshAccessTokens.bind(this.oauth2Account),
             interval: 60 * 60 * 1000, // 6 hours
         });
+        this.registerCapabilityListener('locked', async (value) => {
+            if (value)
+            {
+                this.log('Turning alarm on.');
+                return this.apiCallPut({ uri: `homes/${this.id}/alarm` }, { alarm_status: "on" });
+            }
+            else
+            {
+                this.log('Turning alarm off.');
+                return this.apiCallPut({ uri: `homes/${this.id}/alarm` }, { alarm_status: "off" });
+            }
+        });
         this._GetStateInfo();
         this._Set_listeners();
     }
@@ -44,9 +56,9 @@ class PointHome extends OAuth2Device {
         this.apiCallGet({ uri: `homes/${this.id}` }).then((data) => {
             this.log(`alarm has state ${data.alarm_status}`)
             if (data.alarm_status == "off")
-                this.setCapabilityValue('alarm_generic', false);
+                this.setCapabilityValue('locked', false);
             if (data.alarm_status == "on")
-                setCapabilityValue('alarm_generic', true);
+                this.setCapabilityValue('locked', true);
         });
     }
 
