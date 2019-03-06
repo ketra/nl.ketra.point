@@ -8,7 +8,8 @@ const actions = {
     temperature: "measure_temperature",
     humidity: "measure_humidity",
     pressure: "measure_pressure",
-    sound_level: "measure_noise"
+    sound_level: "measure_noise",
+    part_als: "measure_luminance",
 }
 
 class point extends OAuth2Device {
@@ -50,7 +51,7 @@ class point extends OAuth2Device {
 
     }
     async _GetStateInfo() {
-        this.log(`processing Data for device ${this.id}`);
+        this.log(`processing Data for PointDevice ${this.id}`);
         for (let action in actions) {
             this._GetDataForAction(action, actions[action]);
         }
@@ -64,10 +65,15 @@ class point extends OAuth2Device {
             uri: `devices/${this.id}/${action}?start_at=${datum.toISOString()}`
         }
         this.apiCallGet(calldata).then((data) => {
-            var value = data.values[data.values.length - 1]
-            let collectiontime = new Date(value.datetime);
-            this.log(`Collecting ${action}  With Date ${collectiontime.toLocaleString()} And value ${value.value}`);
-            this.setCapabilityValue(capability, parseFloat(value.value));
+            if (Array.isArray(data.values) && data.values.length > 0) {
+                var value = data.values[data.values.length - 1]
+                let collectiontime = new Date(value.datetime);
+                this.log(`Collecting ${action}  With Date ${collectiontime.toLocaleString()} And value ${value.value}`);
+                this.setCapabilityValue(capability, parseFloat(value.value));
+            }
+            else {
+                this.log(`No Data found for ${action}`);
+            }
         });
     }
 
@@ -137,6 +143,7 @@ class point extends OAuth2Device {
                 let eventtype = args.body.event.type;
                 this.log(eventtype);
                 //this.SetValue(device);
+                let sensor_value = args.body.event.sensor_value;
                 this._flowTriggerGenericAlarm.trigger(device, { "Alarm": eventtype }, {});
                 switch (eventtype) {
                     case "alarm_heard":
@@ -256,7 +263,7 @@ class point extends OAuth2Device {
                     if (webhook.url === Homey.env.WEBHOOK_URL) {
                         this.log(`found webhook ${webhook.hook_id}`);
                         webhookIsRegistered = true;
-                        this.registerWebhook(webhook.hook_id);
+                        this.registerWebhook(webhook);
                     }
                 })
                 if (!webhookIsRegistered)
@@ -295,7 +302,7 @@ class point extends OAuth2Device {
                     }
                 });
                 this.log(`Created webhook ${webhook.hook_id}`);
-                this.registerWebhook(webhook.hook_id);
+                this.registerWebhook(webhook);
             } catch (err) {
                 this.error('failed to register webhook subscription', err.message);
 

@@ -1,21 +1,35 @@
 ﻿const Homey = require('homey');
-//const axios = require('axios')
-const PointAPI = require('../../Lib/Api')
 const utils = require('../../Lib/utils')
-const Hook = require('../../Lib/Webhook')
+const OAuth2Device = require('homey-wifidriver').OAuth2Device;
 const POLL_INTERVAL = 60 * 1000;
 
-class pointhome extends Homey.Device {
+class PointHome extends OAuth2Device {
 
-    onInit() {
-        this._utils = new utils();
-        
-        this._API = new PointAPI();
-        this._API.authenticate((error, result) => { });
+    async onInit() {
+        await super.onInit({
+            apiBaseUrl: `https://api.minut.com/v1/`,
+            throttle: 200,
+            rateLimit: {
+                max: 15,
+                per: 60000,
+            },
+        }).catch(err => {
+            this.error('Error onInit', err.stack);
+            return err;
+        });
+        this.log('init PointHome');
         let data = this.getData();
-        this._utils.logtoall("Init", "Home with ID: " + data.id);
         this.id = data.id;
-        this.GetStatusInterval = setInterval(this._GetStateInfo.bind(this), 60 * 1000);
+        this.registerPollInterval({
+            id: 'GetStatusInfo',
+            fn: this._GetStateInfo.bind(this),
+            interval: POLL_INTERVAL,
+        })
+        this.registerPollInterval({
+            id: 'refreshTokens',
+            fn: this.oauth2Account.refreshAccessTokens.bind(this.oauth2Account),
+            interval: 60 * 60 * 1000, // 6 hours
+        });
         this._GetStateInfo();
         this._Set_listeners();
     }
@@ -26,18 +40,14 @@ class pointhome extends Homey.Device {
     }
 
     async _GetStateInfo() {
-        try {
-            this._API.GetHomeAlarm(this.id, (error, result) => {
-                if (error)
-                    console.log(error);
-                this._utils.logtoall("Device", "The alarm has state " + result)
-                this.setCapabilityValue('alarm_generic', result);
-            });
-        }
-        catch (err) {
-            this._utils.logtoall("Device", err)
-            console.log(err)
-        }
+        this.log(`processing Data for Pointhome ${this.id}`);
+        this.apiCallGet({ uri: `homes/${this.id}` }).then((data) => {
+            this.log(`alarm has state ${data.alarm_status}`)
+            if (data.alarm_status == "off")
+                this.setCapabilityValue('alarm_generic', false);
+            if (data.alarm_status == "on")
+                setCapabilityValue('alarm_generic', true);
+        });
     }
 
     _Set_listeners() {
@@ -45,14 +55,21 @@ class pointhome extends Homey.Device {
         set_alarm_on
             .register()
             .registerRunListener((args, state) => {
-                this._API.SetAlarmStatus(this.id, "on", () => { return Promise.resolve() });
+                this.log('Turning alarm on.');
+                return this.apiCallPut({ uri: `homes/${this.id}/alarm` }, { alarm_status: "on" });
             });
         let set_alarm_off = new Homey.FlowCardAction('set_alarm_off');
         set_alarm_off
             .register()
             .registerRunListener((args, state) => {
-                this._API.SetAlarmStatus(this.id, "off", () => { return Promise.resolve() });
+                this.log('Turning alarm off.');
+                return this.apiCallPut({ uri: `homes/${this.id}/alarm` }, { alarm_status: "off" });
             });
     }
+    _setState(status)
+    {
+        
+
+    }
 }
-module.exports = pointhome;
+module.exports = PointHome;

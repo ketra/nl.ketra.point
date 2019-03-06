@@ -396,6 +396,7 @@
               "measure_humidity",
               "measure_noise",
               "measure_pressure",
+              "measure_luminance",
               "LoudNoise",
               "HumAlarm",
               "TempAlarm"

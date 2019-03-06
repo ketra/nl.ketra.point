@@ -12,7 +12,7 @@ const oauth2ClientConfig = {
     tokenEndpoint: `https://api.minut.com/v1/oauth/token`,
     key: Homey.env.CLIENT_ID,
     secret: Homey.env.CLIENT_SECRET,
-    allowMultipleAccounts: false,
+    allowMultipleAccounts: true,
 };
 
 const API_BASE_URL = 'https://api.minut.com/v1/';

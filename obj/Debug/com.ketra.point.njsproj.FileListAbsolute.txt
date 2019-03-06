@@ -1,3 +1,4 @@
 d:\Repos\nl.ketra.point\obj\Debug\com.ketra.point.njsprojAssemblyReference.cache
 d:\Repos\nl.ketra.point\obj\Debug\com.ketra.point.njsproj.CoreCompileInputs.cache
 d:\Repos\nl.ketra.point\bin\Microsoft.NodejsTools.WebRole.dll
+D:\Code\homey\com.ketra.point\bin\Microsoft.NodejsTools.WebRole.dll
