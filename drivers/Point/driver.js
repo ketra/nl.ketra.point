@@ -11,12 +11,7 @@ class Point extends Homey.Driver  {
         this.utils = new util()
         let API = new PointAPI()
             try {
-                API.startOath(socket, (err, result) => {
-                    socket.on('list_devices', (data, callback) => {
-                        this.utils.logtoall("Oauth process", "Setup ListDevices");
-                        API.GetDevices(callback);
-                    });
-                });
+                API.startOath(socket);
             }
             catch (err) {
                 this.utils.logtoall(err)
