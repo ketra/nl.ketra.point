@@ -1,6 +1,8 @@
 ---
 title: Homey Point Application
 timezone: UTC
+sidebar:
+  nav: "docs"
 collections:
   links:
     title: Links
