@@ -3,3 +3,4 @@ title: Homey Point Application
 timezone: UTC
 theme: jekyll-theme-slate
 description: A homey app for adding the minute point
+show_downloads: true
