@@ -1,15 +1,15 @@
 main:
-  - title: "Quick-Start Guide"
-    url: /docs/quick-start-guide/
-  - title: "Posts"
+  - title: Athom App store
+    url: 'https://apps.athom.com/app/com.ketra.point'
+  - title: Posts
     url: /year-archive/
-  - title: "Categories"
+  - title: Categories
     url: /categories/
-  - title: "Tags"
+  - title: Tags
     url: /tags/
-  - title: "Pages"
+  - title: Pages
     url: /page-archive/
-  - title: "Collections"
+  - title: Collections
     url: /collection-archive/
-  - title: "External Link"
-    url: https://google.com
+  - title: External Link
+    url: 'https://google.com'
