@@ -1,8 +1,6 @@
 ---
 title: Homey Point Application
 timezone: UTC
-sidebar:
-  nav: "docs"
 collections:
   links:
     title: Links
@@ -13,4 +11,6 @@ collections:
   uploads:
     title: Uploads
     output: true
+sidebar:
+  nav: docs
 theme: jekyll-theme-slate
