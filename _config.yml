@@ -4,3 +4,6 @@ timezone: UTC
 theme: jekyll-theme-slate
 description: A homey app for adding the minute point
 show_downloads: true
+github:
+  zip_url: https://apps.athom.com/app/com.ketra.point
+  another_url: another value
