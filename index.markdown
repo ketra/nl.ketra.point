@@ -22,12 +22,11 @@ there are 2 devices added by this app
      * light (not supported by API yet.
 
    * React to alarms of:
-     
-    * High/Low pressure.
 
-    * High/low temperature.
+     1.   High/Low pressure.
 
-    * High/low humidity.
+     2.   High/low temperature.
 
-    * High/low sound.
- 
+     3.   High/low humidity.
+
+     4.   High/low sound.
