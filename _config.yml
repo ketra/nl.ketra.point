@@ -1,0 +1,7 @@
+---
+title: Homey Point Application
+timezone: UTC
+sidebar:
+  nav: docs
+  classes: wide
+theme: jekyll-theme-slate
