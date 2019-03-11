@@ -1,6 +1,7 @@
 ﻿const Homey = require('homey');
 const utils = require('../../Lib/utils')
 const OAuth2Device = require('homey-wifidriver').OAuth2Device;
+//const { OAuth2Device } = require('homey-oauth2app');
 const POLL_INTERVAL = 60 * 1000;
 
 class PointHome extends OAuth2Device {

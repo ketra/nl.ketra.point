@@ -1,7 +1,7 @@
 const Homey = require('homey');
 const utils = require('../../Lib/utils')
-const Hook = require('../../Lib/Webhook')
 const OAuth2Device = require('homey-wifidriver').OAuth2Device;
+//const { OAuth2Device } = require('homey-oauth2app');
 const POLL_INTERVAL = 60 * 1000;
 
 const actions = {
@@ -162,6 +162,7 @@ class point extends OAuth2Device {
                         this.log(`Motion Seen alarm triggering`);
                         this._flowTriggeralarm_Motion.trigger(device, {}, {});
                         this.setCapabilityValue("alarm_motion", true);
+                        break;
                     case "temperature_high":
                         this.log("Triggering temperature_high");
                         this._flowTriggerTempHigh.trigger(device, { "temperature": sensor_value }, {});
