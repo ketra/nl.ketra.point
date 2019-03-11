@@ -1,7 +1,0 @@
-docs:
-  - title: Getting Started
-    children:
-      - title: "Homey App Store"
-        url: https://apps.athom.com/app/com.ketra.point
-      - title: "Code"
-        url: https://github.com/ketra/nl.ketra.point
