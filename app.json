@@ -13,29 +13,32 @@
     "security"
   ],
   "capabilities": {
-    "TempAlarm": {
+    "alarm_Temp": {
       "type": "boolean",
       "title": {
-        "en": "Temperature Alarm"
+        "en": "Temperature"
       },
       "getable": true,
-      "setable": true
+      "setable": false,
+      "icon": "/drivers/Point/assets/icons/TempAlarm.svg"
     },
-    "HumAlarm": {
+    "alarm_Hum": {
       "type": "boolean",
       "title": {
-        "en": "humidity Alarm"
+        "en": "humidity"
       },
       "getable": true,
-      "setable": true
+      "setable": false,
+      "icon": "/drivers/Point/assets/icons/HumAlarm.svg"
     },
-    "LoudNoise": {
+    "alarm_Noise": {
       "type": "boolean",
       "title": {
         "en": "Loud noise"
       },
       "getable": true,
-      "setable": true
+      "setable": false,
+      "icon": "/drivers/Point/assets/icons/LoudNoise.svg"
     }
   },
   "flow": {
@@ -75,6 +78,20 @@
         "title": {
           "en": "Button was pressed",
           "nl": "De knop was ingedrukt."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
+      },
+      {
+        "id": "alarm_grace_period_expired",
+        "title": {
+          "en": "Motion was seen",
+          "nl": "Beweging gedetecteerd."
         },
         "args": [
           {
@@ -378,10 +395,11 @@
         "measure_humidity",
         "measure_noise",
         "measure_pressure",
-        "alarm_generic",
-        "HumAlarm",
-        "TempAlarm",
-        "LoudNoise"
+        "measure_luminance",
+        "alarm_Hum",
+        "alarm_Temp",
+        "alarm_Noise",
+        "alarm_motion"
       ],
       "images": {
         "large": "/drivers/Point/assets/images/large.png",
@@ -392,19 +410,22 @@
           {
             "id": "sensor",
             "capabilities": [
+              "measure_battery",
               "measure_temperature",
               "measure_humidity",
               "measure_noise",
               "measure_pressure",
-              "LoudNoise",
-              "HumAlarm",
-              "TempAlarm"
+              "measure_luminance",
+              "alarm_Hum",
+              "alarm_Temp",
+              "alarm_Noise",
+              "alarm_motion"
             ],
             "options": {
               "icons": {
-                "LoudNoise": "/drivers/Point/assets/icons/LoudNoise.png",
-                "HumAlarm": "/drivers/Point/assets/icons/HumAlarm.png",
-                "TempAlarm": "/drivers/Point/assets/icons/TempAlarm.png"
+                "LoudNoise": "/drivers/Point/assets/icons/LoudNoise.svg",
+                "HumAlarm": "/drivers/Point/assets/icons/HumAlarm.svg",
+                "TempAlarm": "/drivers/Point/assets/icons/TempAlarm.svg"
               },
               "LoudNoise": {
                 "label": {
@@ -433,6 +454,16 @@
                   },
                   "false": {
                     "en": "Normal Temp"
+                  }
+                }
+              },
+              "MotionAlarm": {
+                "label": {
+                  "true": {
+                    "en": "Motion Seen"
+                  },
+                  "false": {
+                    "en": "All is quiet"
                   }
                 }
               }
@@ -469,7 +500,7 @@
       "name": "Point Home",
       "class": "homealarm",
       "capabilities": [
-        "alarm_generic"
+        "locked"
       ],
       "images": {
         "large": "/drivers/Point/assets/images/large.png",
