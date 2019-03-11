@@ -2,12 +2,11 @@
 title: Homey Point Application
 timezone: UTC
 collections:
-  links:
-    title: Links
-    output: true
   posts:
     title: Posts
     output: true
+    values:
+      author_profile: true
   uploads:
     title: Uploads
     output: true
