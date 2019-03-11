@@ -12,4 +12,5 @@ collections:
     output: true
 sidebar:
   nav: docs
-theme: jekyll-theme-hacker
+  classes: wide
+theme: jekyll-theme-slate
