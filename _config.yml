@@ -4,4 +4,4 @@ timezone: UTC
 sidebar:
   nav: docs
   classes: wide
-theme: jekyll-theme-slate
+theme: jekyll-theme-hacker
