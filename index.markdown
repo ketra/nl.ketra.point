@@ -19,5 +19,3 @@ there are 2 devices added by this app:
     * Alarm State.
   * React to:
     * change of alarm state
-
-&nbsp;
