@@ -2,7 +2,7 @@
 title: Homey Point Application
 timezone: UTC
 theme: jekyll-theme-slate
-description: A homey app for adding the minute point
+description: An app for adding the minute point to the homey
 show_downloads: true
 github:
   zip_url: https://apps.athom.com/app/com.ketra.point
