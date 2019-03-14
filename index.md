@@ -3,7 +3,7 @@ layout: default
 title:  "Minut Point homey app"
 ---
 
-This app for the minut point will integrate the minit point with the Homey by athom.
+This app will integrate the minute point into the Athom homey
 
 there are 2 devices added by this app:
 
