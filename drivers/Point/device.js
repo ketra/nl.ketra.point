@@ -1,7 +1,7 @@
 const Homey = require('homey');
 const utils = require('../../Lib/utils')
-const OAuth2Device = require('homey-wifidriver').OAuth2Device;
-//const { OAuth2Device } = require('homey-oauth2app');
+//const OAuth2Device = require('homey-wifidriver').OAuth2Device;
+const { OAuth2Device } = require('homey-oauth2app');
 const POLL_INTERVAL = 60 * 1000;
 
 const actions = {
@@ -14,42 +14,36 @@ const actions = {
 
 class point extends OAuth2Device {
 
-    async onInit() {
-        await super.onInit({
-            apiBaseUrl: `https://api.minut.com/v1/`,
-            throttle: 200,
-            rateLimit: {
-                max: 15,
-                per: 60000,
-            },
-        }).catch(err => {
-            this.error('Error onInit', err.stack);
-            return err;
-        });
-        this.log('init PointDevice');
-        let data = this.getData();
-        this.id = data.id;
-        //this.GetStatusInterval = setInterval(this._GetStateInfo.bind(this), 60 * 1000)
-        this.registerPollInterval({
-            id: 'GetStatusInfo',
-            fn: this._GetStateInfo.bind(this),
-            interval: POLL_INTERVAL, 
-        })
-        this.registerPollInterval({
-            id: 'refreshTokens',
-            fn: this.oauth2Account.refreshAccessTokens.bind(this.oauth2Account),
-            interval: 60 * 60 * 1000, // 6 hours
-        });
-        try {
-            await this.oauth2Account.refreshAccessTokens();
-        } catch (err) {
-            this.error('onInit() -> refresh access tokens failed', err);
-        }
-        await this.registerWebhookSubscription();
-        await this.RegisterFlows();     
-        this._GetStateInfo();
-
+   async onOAuth2Init() {
+     this.log('init PointDevice');
+     this.id = this.getData().id;
+     this.GetStatusInterval = setInterval(this._GetStateInfo.bind(this), 60 * 1000)
+     this.log(`token = ${this.oAuth2Client.getToken().access_token}`)
+     await this.registerWebhookSubscription();
+     await this.RegisterFlows();
+     this._GetStateInfo();
     }
+
+    onOAuth2Migrate() {
+      const store = this.getStore();
+      if( store.token ) {
+        const token = new OAuth2Token(store.token);
+        const sessionId = OAuth2Util.getRandomId();
+        const configId = this.getDriver().getOAuth2ConfigId();
+
+        return {
+          sessionId,
+          configId,
+          token,
+        }
+
+      }
+    }
+
+    onOAuth2MigrateSuccess() {
+      this.unsetStoreValue('token');
+    }
+
     async _GetStateInfo() {
         this.log(`processing Data for PointDevice ${this.id}`);
         for (let action in actions) {
@@ -61,10 +55,9 @@ class point extends OAuth2Device {
     async _GetDataForAction(action, capability) {
         let datum = new Date();
         datum.setHours(datum.getHours() - 1);
-        let calldata = {
-            uri: `devices/${this.id}/${action}?start_at=${datum.toISOString()}`
-        }
-        this.apiCallGet(calldata).then((data) => {
+        let path = `devices/${this.id}/${action}?start_at=${datum.toISOString()}`
+
+        this.oAuth2Client.getDeviceData(path).then((data) => {
             if (Array.isArray(data.values) && data.values.length > 0) {
                 var value = data.values[data.values.length - 1]
                 let collectiontime = new Date(value.datetime);
@@ -77,21 +70,10 @@ class point extends OAuth2Device {
         });
     }
 
-    /**
-    * This method will be called when the device has been deleted, it makes
-    * sure the client is properly destroyed and left over settings are removed.
-    */
-    onDeleted() {
-        this.log('onDeleted()');
-        super.onDeleted();
-    }
-
     async _GetGeneralData()
     {
-        let calldata = {
-            uri: `devices/${this.id}`
-        }
-        this.apiCallGet(calldata).then((data) => {
+        let path = `devices/${this.id}`
+        this.oAuth2Client.getDeviceData(path).then((data) => {
             this.setCapabilityValue('measure_battery', parseFloat(data.battery.percent))
             if (data.ongoing_events.includes("avg_sound_high"))
                 this.setCapabilityValue('alarm_Noise', true);
@@ -124,13 +106,14 @@ class point extends OAuth2Device {
         else
             return undefined;
     }
-    
+
     _webhookhandler(args) {
-        this.log('_webhookhandler', new Date().getTime());
+        let datetime = new Date().getTime()
+        this.log('_webhookhandler',datetime);
         //console.log(data)
         // Data needs to be unwrapped
         if (args && args.hasOwnProperty('body')) {
-            
+
             //this.log(args.body);
             try {
                 this.log('Got a webhook message!');
@@ -197,7 +180,7 @@ class point extends OAuth2Device {
                         break;
                     case "avg_sound_high":
                         this.log("Triggering avg_sound_high");
-                        this._flowTriggeralarm_Sound.trigger(device, { "Sound": sensor_value }, {});
+                        this._flowTriggeralarm_Soundhigh.trigger(device, { "Sound": sensor_value }, {});
                         break;
                     case "sound_level_dropped_normal":
                         this.log("Triggering sound_level_dropped_normal");
@@ -265,12 +248,19 @@ class point extends OAuth2Device {
 
         // TODO: get current webhook
         try {
-            const webhooks = await this.apiCallGet({ uri: `webhooks`, });
+            const webhooks = await this.oAuth2Client.getDeviceData(`webhooks`);
             //console.log(webhooks);
             // Detect if a webhook was already registered by Homey
+            let webhooks_found = 0;
             if (Array.isArray(webhooks.hooks)) {
                 webhooks.hooks.forEach(webhook => {
                     if (webhook.url === Homey.env.WEBHOOK_URL) {
+                        if (webhooks_found > 1) {
+                            this.log("multiple hooks found.")
+                            this.oAuth2Client.delete({path : `webhooks/${webhook.hook_id}`})
+                            return;
+                        }
+                        webhooks_found++;
                         this.log(`found webhook ${webhook.hook_id}`);
                         webhookIsRegistered = true;
                         this.registerWebhook(webhook);
@@ -286,30 +276,11 @@ class point extends OAuth2Device {
         // Start new subscription if not yet registered
         if (!webhookIsRegistered) {
             try {
-                var webhook = await this.apiCallPost({
-                    uri: `webhooks`,
+                var webhook = await this.oAuth2Client.post({
+                    path: `webhooks`,
                     json: {
                         url: Homey.env.WEBHOOK_URL,
                         events: ["*"]
-                        //events: ["alarm_heard",
-                        //    "glassbreak",
-                        //    "short_button_press",
-                        //    "temperature_high",
-                        //    "temperature_low",
-                        //    "temperature_dropped_normal",
-                        //    "temperature_risen_normal",
-                        //    "humidity_high",
-                        //    "humidity_low",
-                        //    "humidity_dropped_normal",
-                        //    "humidity_risen_normal",
-                        //    "device_offline",
-                        //    "device_online",
-                        //    "tamper",
-                        //    "battery_low",
-                        //    "avg_sound_high",
-                        //    "sound_level_high_quiet_hours",
-                        //    "sound_level_high_despite_warning",
-                        //    "sound_level_dropped_normal"]
                     }
                 });
                 this.log(`Created webhook ${webhook.hook_id}`);

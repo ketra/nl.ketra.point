@@ -401,6 +401,9 @@
         "alarm_Noise",
         "alarm_motion"
       ],
+      "energy": {
+        "batteries": [ "INTERNAL" ]
+      },
       "images": {
         "large": "/drivers/Point/assets/images/large.png",
         "small": "/drivers/Point/assets/images/small.png"

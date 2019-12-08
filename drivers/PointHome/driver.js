@@ -3,27 +3,14 @@
 const Homey = require('homey');
 const util = require('../../Lib/utils')
 const PointDevice = require('./device.js');
-const OAuth2Driver = require('homey-wifidriver').OAuth2Driver;
-//const { OAuth2Driver } = require('homey-oauth2app');
+//const OAuth2Driver = require('homey-wifidriver').OAuth2Driver;
+const { OAuth2Driver } = require('homey-oauth2app');
 
-const oauth2ClientConfig = {
-    configId: 'default',
-    url: `https://api.minut.com/v1/oauth/authorize?client_id=${Homey.env.CLIENT_ID}&response_type=code&redirect_uri=https://callback.athom.com/oauth2/callback`,
-    tokenEndpoint: `https://api.minut.com/v1/oauth/token`,
-    key: Homey.env.CLIENT_ID,
-    secret: Homey.env.CLIENT_SECRET,
-    allowMultipleAccounts: true,
-};
-
-const API_BASE_URL = 'https://api.minut.com/v1/';
 
 class PointHome extends OAuth2Driver {
 
-    async onInit() {
-
-        // Start OAuth2Client
-        await super.onInit({ oauth2ClientConfig });
-        this.log(`Authorizeurl = ${oauth2ClientConfig.url}`);
+    async onOAuth2Init() {
+      this.log('Initializing PointHome');
     }
 
 	/**
@@ -32,24 +19,14 @@ class PointHome extends OAuth2Driver {
 	 * temporary OAuth2 account that can be used to fetch the devices from the users account.
 	 * @returns {Promise}
 	 */
-    onPairOAuth2ListDevices() {
-        return this.apiCallGet({ uri: `${API_BASE_URL}homes` })
-            .then(result => {
-                this.log(`got ${result.homes.length} homes`);
-                if (Array.isArray(result.homes)) {
-                    return result.homes.map(home => ({
-                        name: home.name,
-                        data: {
-                            id: home.home_id,
-                        },
-                    }));
-                }
-                return [];
-            })
-            .catch(err => {
-                this.error('failed to get homes', err.stack);
-                throw err;
-            });
+    async onPairListDevices({ oAuth2Client }) {
+      const points = await oAuth2Client.getHomes()
+      return result.homes.map(home => ({
+          name: home.name,
+          data: {
+              id: home.home_id,
+          },
+      }));
     }
 
 	/**

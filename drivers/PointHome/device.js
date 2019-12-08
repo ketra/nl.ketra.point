@@ -1,23 +1,12 @@
 ﻿const Homey = require('homey');
 const utils = require('../../Lib/utils')
-const OAuth2Device = require('homey-wifidriver').OAuth2Device;
-//const { OAuth2Device } = require('homey-oauth2app');
+//const OAuth2Device = require('homey-wifidriver').OAuth2Device;
+const { OAuth2Device } = require('homey-oauth2app');
 const POLL_INTERVAL = 60 * 1000;
 
 class PointHome extends OAuth2Device {
 
-    async onInit() {
-        await super.onInit({
-            apiBaseUrl: `https://api.minut.com/v1/`,
-            throttle: 200,
-            rateLimit: {
-                max: 15,
-                per: 60000,
-            },
-        }).catch(err => {
-            this.error('Error onInit', err.stack);
-            return err;
-        });
+   async onOAuth2Init() {
         this.log('init PointHome');
         let data = this.getData();
         this.id = data.id;
@@ -81,7 +70,7 @@ class PointHome extends OAuth2Device {
     }
     _setState(status)
     {
-        
+
 
     }
 }
