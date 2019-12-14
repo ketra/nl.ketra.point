@@ -12,7 +12,7 @@ class PointApp extends OAuth2App {
 
     onOAuth2Init() {
       this.utils = new util();
-      this.enableOAuth2Debug();
+      //this.enableOAuth2Debug();
       this.setOAuth2Config({
         client: PointOauthClient,
   			clientId: Homey.env.CLIENT_ID,
@@ -25,10 +25,6 @@ class PointApp extends OAuth2App {
       this.log('PointApp is running...');
       this.log("Main", "App Started");
       }
-
-    log(Text) {
-        this.utils.logtoall("", Text);
-    }
 }
 
 module.exports = PointApp;

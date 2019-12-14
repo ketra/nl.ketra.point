@@ -20,13 +20,19 @@ class PointHome extends OAuth2Driver {
 	 * @returns {Promise}
 	 */
     async onPairListDevices({ oAuth2Client }) {
-      const points = await oAuth2Client.getHomes()
-      return result.homes.map(home => ({
-          name: home.name,
-          data: {
-              id: home.home_id,
-          },
-      }));
+      return oAuth2Client.getHomes()
+      .then(result => {
+          this.log(`got ${result.homes.length} Homes`);
+          if (Array.isArray(result.homes)) {
+              return result.homes.map(home => ({
+                  name: home.name,
+                  data: {
+                      id: home.home_id,
+                  },
+              }));
+          }
+          return [];
+      })
     }
 
 	/**
