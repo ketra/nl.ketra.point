@@ -1,30 +1,36 @@
 ﻿const Homey = require('homey');
-const utils = require('../../Lib/utils')
-//const OAuth2Device = require('homey-wifidriver').OAuth2Device;
+const utils = require('../../Lib/utils');
 const { OAuth2Device } = require('homey-oauth2app');
 const POLL_INTERVAL = 60 * 1000;
 
 class PointHome extends OAuth2Device {
 
-   async onOAuth2Init() {
+    async onOAuth2Init() {
         this.log('init PointHome');
+        this.readyDevice();
+    }
+
+    readyDevice() {
         let data = this.getData();
         this.id = data.id;
-        this.GetStatusInterval = setInterval(this._GetStateInfo.bind(this), 60 * 1000)
+        this.GetStatusInterval = setInterval(this._GetStateInfo.bind(this), 60 * 1000);
         this.registerCapabilityListener('locked', async (value) => {
-            if (value)
-            {
+            if (value) {
                 this.log('Turning alarm on.');
-                return this.oAuth2Client.put({ path: `homes/${this.id}/alarm`, json: { alarm_status: "on" }});
+                return this.oAuth2Client.put({ path: `homes/${this.id}/alarm`, json: { alarm_status: "on" } });
             }
-            else
-            {
+            else {
                 this.log('Turning alarm off.');
-                return this.oAuth2Client.put({ path: `homes/${this.id}/alarm`, json: { alarm_status: "off" }});
+                return this.oAuth2Client.put({ path: `homes/${this.id}/alarm`, json: { alarm_status: "off" } });
             }
         });
         this._GetStateInfo();
         this._Set_listeners();
+    }
+
+    unreadyDevice() {
+        this.log('Cleared Timeout');
+        clearTimeout(this.GetStatusInterval);
     }
 
     onDeleted()
@@ -36,9 +42,9 @@ class PointHome extends OAuth2Device {
         this.log(`processing Data for Pointhome ${this.id}`);
         this.oAuth2Client.getDeviceData(`homes/${this.id}`).then((data) => {
             this.log(`alarm has state ${data.alarm_status}`)
-            if (data.alarm_status == "off")
+            if (data.alarm_status === "off")
                 this.setCapabilityValue('locked', false);
-            if (data.alarm_status == "on")
+            if (data.alarm_status === "on")
                 this.setCapabilityValue('locked', true);
         });
     }
@@ -63,6 +69,27 @@ class PointHome extends OAuth2Device {
     {
 
 
+    }
+    async resetOAuth2Client({ sessionId, configId }) {
+
+        // Store updated client config
+        await this.setStoreValue('OAuth2SessionId', sessionId);
+        await this.setStoreValue('OAuth2ConfigId', configId);
+
+        // Check if client exists then bind it to this instance
+        let client;
+        if (Homey.app.hasOAuth2Client({ configId, sessionId })) {
+            client = Homey.app.getOAuth2Client({ configId, sessionId });
+        } else {
+            this.error('OAuth2Client reset failed');
+            return this.setUnavailable(Homey.__('authentication.re-login_failed'));
+        }
+
+        // Rebind new oAuth2Client
+        this.oAuth2Client = client;
+
+        // Check if device agreementId is present in OAuth2 account
+        return this.setAvailable(this.readyDevice());
     }
 }
 module.exports = PointHome;
