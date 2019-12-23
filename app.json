@@ -1,6 +1,6 @@
 {
   "id": "com.ketra.point",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "compatibility": ">=2.5.0",
   "sdk": 2,
   "name": {
@@ -46,17 +46,20 @@
     }
   },
   "flow": {
-    "actions": [{
+    "actions": [
+      {
         "id": "set_alarm_on",
         "title": {
           "en": "Alarm ON",
           "nl": "Alarm Aan"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=PointHome"
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=PointHome"
+          }
+        ]
       },
       {
         "id": "set_alarm_off",
@@ -64,24 +67,29 @@
           "en": "Alarm Off",
           "nl": "Alarm uit"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=PointHome"
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=PointHome"
+          }
+        ]
       }
     ],
-    "triggers": [{
+    "triggers": [
+      {
         "id": "short_button_press",
         "title": {
           "en": "Button was pressed",
           "nl": "De knop was ingedrukt."
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
       },
       {
         "id": "alarm_grace_period_expired",
@@ -89,11 +97,13 @@
           "en": "Motion was seen",
           "nl": "Beweging gedetecteerd."
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
       },
       {
         "id": "temperature_high",
@@ -101,20 +111,24 @@
           "en": "high temperature",
           "nl": "hoge temperatuur"
         },
-        "tokens": [{
-          "name": "temperature",
-          "type": "number",
-          "title": {
-            "en": "Temp",
-            "nl": "Temp"
-          },
-          "example": 20.1
-        }],
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }]
+        "tokens": [
+          {
+            "name": "temperature",
+            "type": "number",
+            "title": {
+              "en": "Temp",
+              "nl": "Temp"
+            },
+            "example": 20.1
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
       },
       {
         "id": "temperature_low",
@@ -122,20 +136,24 @@
           "en": "Low temperature",
           "nl": "Lage temperatuur"
         },
-        "tokens": [{
-          "name": "temperature",
-          "type": "number",
-          "title": {
-            "en": "Temp",
-            "nl": "Temp"
-          },
-          "example": 20.1
-        }],
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }]
+        "tokens": [
+          {
+            "name": "temperature",
+            "type": "number",
+            "title": {
+              "en": "Temp",
+              "nl": "Temp"
+            },
+            "example": 20.1
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
       },
       {
         "id": "temperature_normal",
@@ -143,20 +161,24 @@
           "en": "Temperature back to normal",
           "nl": "Temperatuur terug naar normaal"
         },
-        "tokens": [{
-          "name": "temperature",
-          "type": "number",
-          "title": {
-            "en": "Temp",
-            "nl": "Temp"
-          },
-          "example": 20.1
-        }],
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }]
+        "tokens": [
+          {
+            "name": "temperature",
+            "type": "number",
+            "title": {
+              "en": "Temp",
+              "nl": "Temp"
+            },
+            "example": 20.1
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
       },
       {
         "id": "humidity_high",
@@ -164,20 +186,24 @@
           "en": "High humidity",
           "nl": "Hoge luchtvochtigheid"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }],
-        "tokens": [{
-          "name": "Humidity",
-          "type": "number",
-          "title": {
-            "en": "Humidity",
-            "nl": "Luchtvochtigheid"
-          },
-          "example": 1057.5
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "Humidity",
+            "type": "number",
+            "title": {
+              "en": "Humidity",
+              "nl": "Luchtvochtigheid"
+            },
+            "example": 1057.5
+          }
+        ]
       },
       {
         "id": "humidity_low",
@@ -185,20 +211,24 @@
           "en": "Low humidity",
           "nl": "Lage luchtvochtigheid"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }],
-        "tokens": [{
-          "name": "Humidity",
-          "type": "number",
-          "title": {
-            "en": "Humidity",
-            "nl": "Luchtvochtigheid"
-          },
-          "example": 1057.5
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "Humidity",
+            "type": "number",
+            "title": {
+              "en": "Humidity",
+              "nl": "Luchtvochtigheid"
+            },
+            "example": 1057.5
+          }
+        ]
       },
       {
         "id": "humidity_normal",
@@ -206,20 +236,24 @@
           "en": "Humidity back to normal",
           "nl": "Luchtvochtigheid terug naar normaal"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }],
-        "tokens": [{
-          "name": "Humidity",
-          "type": "number",
-          "title": {
-            "en": "Humidity",
-            "nl": "Luchtvochtigheid"
-          },
-          "example": 1057.5
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "Humidity",
+            "type": "number",
+            "title": {
+              "en": "Humidity",
+              "nl": "Luchtvochtigheid"
+            },
+            "example": 1057.5
+          }
+        ]
       },
       {
         "id": "avg_sound_high",
@@ -227,20 +261,24 @@
           "en": "Loud noise heard",
           "nl": "Hard geluid gehoord"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }],
-        "tokens": [{
-          "name": "Sound",
-          "type": "number",
-          "title": {
-            "en": "Sound (dB)",
-            "nl": "Geluid (dB)"
-          },
-          "example": 60.5
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "Sound",
+            "type": "number",
+            "title": {
+              "en": "Sound (dB)",
+              "nl": "Geluid (dB)"
+            },
+            "example": 60.5
+          }
+        ]
       },
       {
         "id": "avg_sound_normal",
@@ -248,20 +286,24 @@
           "en": "Sound back to normal",
           "nl": "Geluid terug naar normaal"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }],
-        "tokens": [{
-          "name": "Sound",
-          "type": "number",
-          "title": {
-            "en": "Sound (dB)",
-            "nl": "Geluid (dB)"
-          },
-          "example": 60.5
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "Sound",
+            "type": "number",
+            "title": {
+              "en": "Sound (dB)",
+              "nl": "Geluid (dB)"
+            },
+            "example": 60.5
+          }
+        ]
       },
       {
         "id": "device_offline",
@@ -269,11 +311,13 @@
           "en": "Device offline",
           "nl": "Apparaat offline"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
       },
       {
         "id": "device_online",
@@ -281,11 +325,13 @@
           "en": "Device online",
           "nl": "Apparaat online"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
       },
       {
         "id": "alarm_heard",
@@ -293,11 +339,13 @@
           "en": "An alarm was heard.",
           "nl": "Een alarm gehoord"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
       },
       {
         "id": "Tamper",
@@ -305,11 +353,13 @@
           "en": "Tamper Alarm Triggered",
           "nl": "Tamper beveliging afgegaan"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ]
       },
       {
         "id": "any_alarm",
@@ -317,24 +367,29 @@
           "en": "an alarm was triggered",
           "nl": "er is een alarm"
         },
-        "args": [{
-          "name": "device",
-          "type": "device",
-          "filter": "driver_id=Point"
-        }],
-        "tokens": [{
-          "name": "Alarm",
-          "type": "string",
-          "title": {
-            "en": "Type of alarm",
-            "nl": "Type alarm"
-          },
-          "example": "Alarm_heard"
-        }]
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "Alarm",
+            "type": "string",
+            "title": {
+              "en": "Type of alarm",
+              "nl": "Type alarm"
+            },
+            "example": "Alarm_heard"
+          }
+        ]
       }
     ]
   },
-  "drivers": [{
+  "drivers": [
+    {
       "id": "Point",
       "name": "Minut Point",
       "class": "sensor",
@@ -360,7 +415,8 @@
         "small": "/drivers/Point/assets/images/small.png"
       },
       "mobile": {
-        "components": [{
+        "components": [
+          {
             "id": "sensor",
             "capabilities": [
               "measure_battery",
@@ -430,7 +486,8 @@
           }
         ]
       },
-      "pair": [{
+      "pair": [
+        {
           "id": "login_oauth2",
           "template": "login_oauth2"
         },
@@ -458,7 +515,8 @@
         "large": "/drivers/Point/assets/images/large.png",
         "small": "/drivers/Point/assets/images/small.png"
       },
-      "pair": [{
+      "pair": [
+        {
           "id": "login_oauth2",
           "template": "login_oauth2"
         },

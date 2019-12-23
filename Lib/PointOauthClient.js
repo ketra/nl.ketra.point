@@ -1,6 +1,8 @@
 'use strict';
 
-const { OAuth2Client } = require('homey-oauth2app');
+const {
+  OAuth2Client
+} = require('homey-oauth2app');
 const Homey = require('homey');
 const devices = [];
 class PointOauthClient extends OAuth2Client {
@@ -200,12 +202,13 @@ class PointOauthClient extends OAuth2Client {
   async postWebhook() {
     try {
       var webhook = await this.post({
-        path: `webhooks`,
+        path: `/webhooks`,
         json: {
           url: Homey.env.WEBHOOK_URL,
           events: ["*"]
         }
       });
+      console.log(webhook);
       this.log(`Created webhook ${webhook.hook_id}`);
       this.AttachWebhookListener(webhook);
     } catch (err) {
@@ -233,21 +236,23 @@ class PointOauthClient extends OAuth2Client {
     // TODO: get current webhook
     try {
       let webhooks = await this.getDeviceData(`webhooks`);
-      //console.log(webhooks);
+      console.log(webhooks);
       // Detect if a webhook was already registered by Homey
 
       if (Array.isArray(webhooks.hooks)) {
         let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === Homey.env.WEBHOOK_URL)
+        console.log(mywebhooks);
         if (mywebhooks.length > 1) {
           this.log(`Found multiple webhooks, deleting all.`)
           mywebhooks.forEach(function(webhook) {
             this.delete({
-              path: `webhooks/${webhook.hook_id}`
+              path: `/webhooks/${webhook.hook_id}`
             })
           });
           this.postWebhook();
-        } else if (mywebhooks.length = 1) {
-          this.log(`Found 1 webhook, start listening. to ${mywebhooks[0].hook_id}`)
+        } else if (mywebhooks.length == 1) {
+          this.log(`Found 1 webhook`);
+          this.log(`start listening. to ${mywebhooks[0].hook_id}`)
           this.AttachWebhookListener(mywebhooks[0])
         } else {
           this.log(`No hooks found, registering new webhook`)
