@@ -1,1 +1,10 @@
-{}
+{
+  "settings": {
+    "title": "Minut Account",
+    "login_intro": "Click here to login with your Minut account.",
+    "login_button": "Login",
+    "logged_in": "You are currently logged in.",
+    "logout_intro": "Click here to logout.",
+    "logout_button": "Logout"
+  }
+}

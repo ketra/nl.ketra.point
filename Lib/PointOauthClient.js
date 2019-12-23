@@ -8,20 +8,20 @@ const devices = [];
 class PointOauthClient extends OAuth2Client {
 
   async getDeviceData(uri) {
-    return this.get({
-      path: uri
-    })
+      return this.get({
+          path: uri
+      });
   }
   async getDevices() {
-    this.log("Getting Devices")
-    return this.get({
-      path: '/devices'
-    })
+      this.log("Getting Devices");
+      return this.get({
+          path: '/devices'
+      });
   }
   async getHomes() {
-    return this.get({
-      path: '/homes'
-    })
+      return this.get({
+          path: '/homes'
+      });
   }
   async register_device(device) {
     this.log(`Register ${device.id}`);
@@ -48,7 +48,7 @@ class PointOauthClient extends OAuth2Client {
   }
 
   _webhookhandler(args) {
-    let datetime = new Date().getTime()
+      let datetime = new Date().getTime();
     this.log('_webhookhandler', datetime);
     //console.log(data)
     // Data needs to be unwrapped
