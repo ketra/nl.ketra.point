@@ -214,7 +214,7 @@ class PointOauthClient extends OAuth2Client {
       // Pass error
       throw err;
     }
-  }
+    }
 
 
   /**
@@ -237,20 +237,20 @@ class PointOauthClient extends OAuth2Client {
       // Detect if a webhook was already registered by Homey
 
       if (Array.isArray(webhooks.hooks)) {
-        let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === Homey.env.WEBHOOK_URL)
+          let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === Homey.env.WEBHOOK_URL);
         if (mywebhooks.length > 1) {
-          this.log(`Found multiple webhooks, deleting all.`)
+            this.log(`Found multiple webhooks, deleting all.`);
           mywebhooks.forEach(function(webhook) {
-            this.delete({
-              path: `webhooks/${webhook.hook_id}`
-            })
+              this.delete({
+                  path: `webhooks/${webhook.hook_id}`
+              });
           });
           this.postWebhook();
-        } else if (mywebhooks.length = 1) {
-          this.log(`Found 1 webhook, start listening. to ${mywebhooks[0].hook_id}`)
-          this.AttachWebhookListener(mywebhooks[0])
+        } else if (mywebhooks.length === 1) {
+            this.log(`Found 1 webhook, start listening. to ${mywebhooks[0].hook_id}`);
+            this.AttachWebhookListener(mywebhooks[0]);
         } else {
-          this.log(`No hooks found, registering new webhook`)
+            this.log(`No hooks found, registering new webhook`);
           this.postWebhook();
         }
       }
