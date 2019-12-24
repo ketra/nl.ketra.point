@@ -10,7 +10,7 @@ class PointApp extends OAuth2App {
 
     onOAuth2Init() {
         this.utils = new util();
-        //this.enableOAuth2Debug();
+        this.enableOAuth2Debug();
         this.setOAuth2Config({
             client: PointOauthClient,
             clientId: Homey.env.CLIENT_ID,
@@ -141,11 +141,16 @@ class PointApp extends OAuth2App {
         let sessions = null;
         try {
             sessions = this.getSavedOAuth2Sessions();
+            console.log(sessions);
         } catch (err) {
             this.error('isAuthenticated() -> error', err.message);
             throw err;
         }
         if (Object.keys(sessions).length > 1) {
+            session.forEach(ses => {
+                let sessionId = Object.keys(ses)[0];
+                this.deleteOAuth2Client({ sessionId, configId: ses.configId });
+            });
             throw new Error('Multiple OAuth2 sessions found, not allowed.');
         }
         this.log('_getSession() ->', Object.keys(sessions).length === 1 ? Object.keys(sessions)[0] : 'no session found');

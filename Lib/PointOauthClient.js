@@ -40,9 +40,9 @@ class PointOauthClient extends OAuth2Client {
 
   AttachWebhookListener(data) {
     const debouncedMessageHandler = debounce(this._webhookhandler.bind(this), 500, true);
-    return new Homey.CloudWebhook(Homey.env.WEBHOOK_ID, Homey.env.WEBHOOK_SECRET, data)
-      .on('message', debouncedMessageHandler)
-      .register()
+      return new Homey.CloudWebhook(Homey.env.WEBHOOK_ID, Homey.env.WEBHOOK_SECRET, data)
+          .on('message', debouncedMessageHandler)
+          .register();
   }
 
   _webhookhandler(args) {
@@ -59,13 +59,13 @@ class PointOauthClient extends OAuth2Client {
         this.log(`ID: ${args.body.event.id}`);
         this.log(`Created At: ${args.body.event.created_at}`);
         this.log(`type: ${args.body.event.type}`);
-        this.log(`Device: ${args.body.event.device_id}`)
+          this.log(`Device: ${args.body.event.device_id}`);
         let device = this.get_device(args.body.event.device_id);
         if (!device) {
           this.log("device undefinded?");
           return;
         } else {
-          this.log(`Device is ${device.id}`)
+            this.log(`Device is ${device.id}`);
         }
         let eventtype = args.body.event.type;
         this.log(eventtype);
@@ -77,7 +77,7 @@ class PointOauthClient extends OAuth2Client {
         switch (eventtype) {
           case "alarm_heard":
             this.log("Triggering alarm_heard");
-            this._flowTriggeralarm_heard.trigger(device, {}, {})
+                this._flowTriggeralarm_heard.trigger(device, {}, {});
             break;
           case "short_button_press":
             this.log(`Triggering short_button_press for ${device.id}`);
@@ -173,7 +173,7 @@ class PointOauthClient extends OAuth2Client {
             break;
         }
       } catch (err) {
-        console.log(err)
+          console.log(err);
       }
 
     }
