@@ -1,8 +1,6 @@
 'use strict';
 
-const {
-  OAuth2Client
-} = require('homey-oauth2app');
+const { OAuth2Client } = require('homey-oauth2app');
 const Homey = require('homey');
 const devices = [];
 class PointOauthClient extends OAuth2Client {
@@ -42,9 +40,9 @@ class PointOauthClient extends OAuth2Client {
 
   AttachWebhookListener(data) {
     const debouncedMessageHandler = debounce(this._webhookhandler.bind(this), 500, true);
-    return new Homey.CloudWebhook(Homey.env.WEBHOOK_ID, Homey.env.WEBHOOK_SECRET, data)
-      .on('message', debouncedMessageHandler)
-      .register()
+      return new Homey.CloudWebhook(Homey.env.WEBHOOK_ID, Homey.env.WEBHOOK_SECRET, data)
+          .on('message', debouncedMessageHandler)
+          .register();
   }
 
   _webhookhandler(args) {
@@ -61,13 +59,13 @@ class PointOauthClient extends OAuth2Client {
         this.log(`ID: ${args.body.event.id}`);
         this.log(`Created At: ${args.body.event.created_at}`);
         this.log(`type: ${args.body.event.type}`);
-        this.log(`Device: ${args.body.event.device_id}`)
+          this.log(`Device: ${args.body.event.device_id}`);
         let device = this.get_device(args.body.event.device_id);
         if (!device) {
           this.log("device undefinded?");
           return;
         } else {
-          this.log(`Device is ${device.id}`)
+            this.log(`Device is ${device.id}`);
         }
         let eventtype = args.body.event.type;
         this.log(eventtype);
@@ -79,7 +77,7 @@ class PointOauthClient extends OAuth2Client {
         switch (eventtype) {
           case "alarm_heard":
             this.log("Triggering alarm_heard");
-            this._flowTriggeralarm_heard.trigger(device, {}, {})
+                this._flowTriggeralarm_heard.trigger(device, {}, {});
             break;
           case "short_button_press":
             this.log(`Triggering short_button_press for ${device.id}`);
@@ -175,7 +173,7 @@ class PointOauthClient extends OAuth2Client {
             break;
         }
       } catch (err) {
-        console.log(err)
+          console.log(err);
       }
 
     }
@@ -202,13 +200,12 @@ class PointOauthClient extends OAuth2Client {
   async postWebhook() {
     try {
       var webhook = await this.post({
-        path: `/webhooks`,
+        path: `webhooks`,
         json: {
           url: Homey.env.WEBHOOK_URL,
           events: ["*"]
         }
       });
-      console.log(webhook);
       this.log(`Created webhook ${webhook.hook_id}`);
       this.AttachWebhookListener(webhook);
     } catch (err) {
@@ -217,7 +214,7 @@ class PointOauthClient extends OAuth2Client {
       // Pass error
       throw err;
     }
-  }
+    }
 
 
   /**
@@ -236,26 +233,24 @@ class PointOauthClient extends OAuth2Client {
     // TODO: get current webhook
     try {
       let webhooks = await this.getDeviceData(`webhooks`);
-      console.log(webhooks);
+      //console.log(webhooks);
       // Detect if a webhook was already registered by Homey
 
       if (Array.isArray(webhooks.hooks)) {
-        let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === Homey.env.WEBHOOK_URL)
-        console.log(mywebhooks);
+          let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === Homey.env.WEBHOOK_URL);
         if (mywebhooks.length > 1) {
-          this.log(`Found multiple webhooks, deleting all.`)
+            this.log(`Found multiple webhooks, deleting all.`);
           mywebhooks.forEach(function(webhook) {
-            this.delete({
-              path: `/webhooks/${webhook.hook_id}`
-            })
+              this.delete({
+                  path: `webhooks/${webhook.hook_id}`
+              });
           });
           this.postWebhook();
-        } else if (mywebhooks.length == 1) {
-          this.log(`Found 1 webhook`);
-          this.log(`start listening. to ${mywebhooks[0].hook_id}`)
-          this.AttachWebhookListener(mywebhooks[0])
+        } else if (mywebhooks.length === 1) {
+            this.log(`Found 1 webhook, start listening. to ${mywebhooks[0].hook_id}`);
+            this.AttachWebhookListener(mywebhooks[0]);
         } else {
-          this.log(`No hooks found, registering new webhook`)
+            this.log(`No hooks found, registering new webhook`);
           this.postWebhook();
         }
       }
