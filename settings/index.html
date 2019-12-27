@@ -1,62 +1,42 @@
-
 <!doctype html>
 <html>
+
 <head>
-    <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+  <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+  <script type="text/javascript" src="/manager/webserver/assets/js/jquery.js"></script>
+  <script type="text/javascript" src="vue.min.js" data-origin="settings"></script>
+  <link rel="stylesheet" type="text/css" href="styles.css" />
+  <script type="text/javascript" src="settings.js" data-origin="settings"></script>
 </head>
+
 <body>
-    <h1 data-i18n="settings.title"></h1>
-    <div id="content">
-        <div id="login" style="display:none;">
-            <p data-i18n="settings.login_intro"></p>
-            <button id="login_btn" data-i18n="settings.login_button" onclick="login()"></button>
-        </div>
-        <div id="logout" style="display:none;">
-            <p data-i18n="settings.logged_in"></p>
-            <p data-i18n="settings.logout_intro"></p>
-            <button id="logout_btn" data-i18n="settings.logout_button" onclick="logout()"></button>
-        </div>
+    <div id="app">
+  <h1 data-i18n="settings.title"></h1>
+  <div id="tab1" class="panel" style="display: inline;">
+    <div id="login" style="display:none;">
+      <p data-i18n="settings.login_intro"></p>
+      <button id="login_btn" data-i18n="settings.login_button" onclick="login()"></button>
     </div>
+    <div id="logout" style="display:none;">
+      <p data-i18n="settings.logged_in"></p>
+      <p data-i18n="settings.logout_intro"></p>
+      <button id="logout_btn" data-i18n="settings.logout_button" onclick="logout()"></button>
+      <button id="refreshhooks_btn" data-i18n="settings.refresh_button" onclick="refreshooks()"></button>
+      <button id="download_btn" data-i18n="settings.download_button" onclick="downloadHistory()"></button>
+    </div>
+    <div id="webhooks" style="display:none;">
+      <p data-i18n="settings.webhook_head"></p>
+      <div class="Overflow">
+          <div class="rTable" id="webhookstab"></div>
+      </div>
+    </div>
+    <div style="height:8px"></div>
+    <textarea id="logtextarea" style="display:none;"></textarea>
+    <div class="Overflow historyheight">
+        <div class="rTable" id="historyTable"></div>
+    </div>
+</div>
+</div>
 </body>
+
 </html>
-<script type="text/javascript">
-  function showLogin() {
-    document.getElementById('logout').style.display = 'none';
-    document.getElementById('login').style.display = 'block';
-  }
-
-  function showLogout() {
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('logout').style.display = 'block';
-  }
-
-  function login() {
-      Homey.api('POST', '/login/', { state: true }, function (err, success) {
-          console.log(`error: ${err} Success:${success}`)
-      if (!err && success) showLogout()
-    });
-  }
-
-  function logout() {
-      Homey.api('POST', '/login/', { state: false }, function (err, success) {
-        console.log(`error: ${err} Success:${success}`)
-      if (!err && success) showLogin();
-    });
-  }
-
-  function onHomeyReady(Homey) {
-    Homey.on('url', url => Homey.openURL(url));
-    Homey.on('authorized', () => showLogout());
-    Homey.on('error', err => {
-      if (err) return Homey.alert(err.message || err);
-    });
-    Homey.api('GET', '/login/', {}, function (err, loggedIn) {
-      if (loggedIn) {
-        showLogout()
-      } else {
-        showLogin()
-      }
-    });
-    Homey.ready();
-  }
-</script>

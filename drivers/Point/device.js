@@ -23,6 +23,7 @@ class MinutDevice extends OAuth2Device {
         await this.oAuth2Client.register_device(this);
         this.GetStatusInterval = setInterval(this._GetStateInfo.bind(this), 60 * 1000);
         this.log(`token = ${this.oAuth2Client.getToken().access_token}`);
+        Homey.app.mylog(`token = ${this.oAuth2Client.getToken().access_token}`);
         await this.oAuth2Client.registerWebhookSubscription();
         await this.oAuth2Client.RegisterFlows();
         this._GetStateInfo();
@@ -72,6 +73,7 @@ class MinutDevice extends OAuth2Device {
 
     async _GetStateInfo() {
         this.log(`processing Data for PointDevice ${this.id}`);
+        Homey.app.mylog(`processing Data for PointDevice ${this.id}`);
         for (let action in actions) {
             this._GetDataForAction(action, actions[action]);
         }
@@ -88,9 +90,11 @@ class MinutDevice extends OAuth2Device {
                 var value = data.values[data.values.length - 1]
                 let collectiontime = new Date(value.datetime);
                 this.log(`Collecting ${action}  With Date ${collectiontime.toLocaleString()} And value ${value.value}`);
+                Homey.app.mylog(`Collecting ${action}  With Date ${collectiontime.toLocaleString()} And value ${value.value}`);
                 this.setCapabilityValue(capability, parseFloat(value.value));
             } else {
                 this.log(`No Data found for ${action}`);
+                Homey.app.mylog(`No Data found for ${action}`);
             }
         });
     }
@@ -135,8 +139,9 @@ class MinutDevice extends OAuth2Device {
 
         // Rebind new oAuth2Client
         this.oAuth2Client = client;
-        this.log(`Bound new client setting availible`); 
-        
+        this.log(`Bound new client setting availible`);
+        Homey.app.mylog(`Bound new client setting availible`);
+
 
 
         return this.setAvailable(this.readyDevice());

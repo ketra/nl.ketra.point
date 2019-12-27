@@ -5,6 +5,52 @@
     "login_button": "Login",
     "logged_in": "You are currently logged in.",
     "logout_intro": "Click here to logout.",
-    "logout_button": "Logout"
-  }
+    "logout_button": "Logout",
+    "refresh_button": "Refresh Webhooks",
+    "download_button": "Download History"
+    },
+  "tab1": {
+    "title": "Dashboard",
+    "status": {
+        "title": "Status",
+        "smode": "Toezicht Mode",
+        "smodeFull": "Volledige Toezicht Mode",
+        "smodePartial": "Gedeeltelijke Toezicht Mode",
+        "alarm": "Alarm"
+    },
+    "history": {
+        "title": "Geschiedenis",
+        "autoRefresh": "Automatisch verversen",
+        "manualRefresh": "Ververs",
+        "useColors": "Gebruik kleuren",
+        "btnClearHistory": "Verwijder geschiedenis",
+        "btnDownload": "Download",
+        "date": "Datum",
+        "time": "Tijd",
+        "smode": "Toezicht Mode",
+        "source": "Bron",
+        "action": "Actie"
+    }
+},
+"history": {
+    "smodedisarmed": "Toezicht mode is uitgeschakeld.",
+    "smodearmed": "Toezicht mode is ingeschakeld.",
+    "smodepartiallyarmed": "Toezicht mode is gedeeltelijk ingeschakeld.",
+    "smodedelayarmed": "Toezicht mode wordt ingeschakeld over ",
+    "smodedelaypartiallyarmed": "Toezicht mode wordt gedeeltelijk ingeschakeld over ",
+    "seconds": " seconden.",
+    "smodedelaychanged": "Inschakelvertraging is verlaagt naar 10 seconden door Laatste Deur handeling",
+    "alarmdeactivated": "Alarm is gedeactiveerd.",
+    "alarmactivated": "Alarm is geactiveerd. ",
+    "alarmactivatedflowcard": "Alarm is geactiveerd door de Flowcard. ",
+    "smodechangedisabled": "Wijziging van de Toezicht Mode is geannuleerd door uitschakelen.",
+    "triggerdalarm": " activeerde Alarm",
+    "delayoverruled": ", uitgestelde Alarm activatie is overruled.",
+    "alarmdelayed": "Alarm activatie is uitgesteld: ",
+    "alarmnotactivated": "Alarm is niet geactiveerd door uitschakelen Toezicht Mode.",
+    "noalarmtriggercountdown": ", geen alarm trigger omdat er een vertraagde trigger actief is.",
+    "noalarmtriggeralarmstate": ", geen alarm trigger omdat het Alarm al geactiveerd is.",
+    "noreport": " heeft al  ",
+    "lastreport": " uren geen info gestuurd. Laatste info: "
+}
 }
