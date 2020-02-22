@@ -50,6 +50,15 @@ let mytimer;
         }
       })
   }
+   function deletehooks() {
+    Homey.api('DELETE', '/webhooks/', {}, function(err, webhooks) {
+      console.log(`error: ${err} Success:${webhooks}`)
+        if (!err) {
+          console.log(webhooks)
+          showWebhooks(webhooks);
+        }
+      })
+  }
 
   function logout() {
     Homey.api('POST', '/login/', {
@@ -61,27 +70,34 @@ let mytimer;
   }
 
   function onHomeyReady(Homey) {
-    Homey.on('url', url => Homey.openURL(url));
-    Homey.on('authorized', () => showLogout());
-    Homey.on('error', err => {
-      if (err) return Homey.alert(err.message || err);
-    });
-    Homey.api('GET', '/login/', {}, function(err, loggedIn) {
-      if (loggedIn) {
-        showLogout();
-        gethooks();
-        refreshHistory();
-      } else {
-        showLogin();
-      }
-    });
-    var LogValuesElement = document.getElementById('LogValues');
+    try {
 
-    Homey.get('myLogActive', function( err, logging ) {
-             if( err ) return Homey.alert( err );
-             LogValuesElement.checked = logging;
-          });
-    Homey.ready();
+      Homey.on('url', url => Homey.openURL(url));
+      Homey.on('authorized', () => showLogout());
+      Homey.on('error', err => {
+        if (err) return Homey.alert(err.message || err);
+      });
+      Homey.api('GET', '/login/', {}, function(err, loggedIn) {
+        if (loggedIn) {
+          showLogout();
+          gethooks();
+          refreshHistory();
+        } else {
+          showLogin();
+        }
+      });
+      var LogValuesElement = document.getElementById('LogValues');
+
+      Homey.get('myLogActive', function( err, logging ) {
+               if( err ) return Homey.alert( err );
+               LogValuesElement.checked = logging;
+            });
+    } catch (e) {
+      Homey.alert(e);
+    } finally {
+        Homey.ready();
+    }
+
   }
   function refreshHistory() {
     try

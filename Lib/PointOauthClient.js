@@ -242,6 +242,29 @@ class PointOauthClient extends OAuth2Client {
     }
   }
 
+  async DeleteOldWebhooks()
+  {
+    try
+    {
+      let webhooks = await this.getDeviceData(`webhooks`);
+      let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === Homey.env.OLD_WEBHOOK_URL);
+      Homey.app.mylog(`deleting old webhooks.`);
+      var self = this;
+      mywebhooks.forEach(function(webhook) {
+        Homey.app.mylog(`deleting ${webhook.hook_id}`);
+        self.delete({
+            path: `webhooks/${webhook.hook_id}`
+        });
+      });
+      return this.GetWebhooks();
+    }
+    catch (err)
+    {
+      this.error(err);
+      Homey.app.mylog(err);
+    }
+  }
+
   async RefreshWebhooks()
   {
     try

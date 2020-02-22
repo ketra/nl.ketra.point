@@ -50,6 +50,7 @@ class PointApp extends OAuth2App {
   async isAuthenticated() {
     try {
       const session = await this._getSession();
+      console.log(session)
       this.log(`isAuthenticated() -> ${!!session}`);
       return !!session;
     } catch (err) {
@@ -202,6 +203,21 @@ class PointApp extends OAuth2App {
     return webhooks;
   }
 
+  async DeleteOldWebhooks() {
+    // Try get first saved client
+    let client;
+    try {
+      client = this.getFirstSavedOAuth2Client();
+    } catch (err) {
+      this.mylog('DeleteOldWebhooks() -> no existing OAuth2 client available');
+    }
+    if (!client || client instanceof Error) {
+      this.error('Could not get oauth client.');
+    }
+    let webhooks = await client.DeleteOldWebhooks();
+    return webhooks;
+  }
+
   // Write information to history and cleanup 20% when history above 2000 lines
   async writeLog(logLine) {
     // console.log(logLine);
@@ -235,16 +251,24 @@ class PointApp extends OAuth2App {
       sessions = this.getSavedOAuth2Sessions();
       console.log(sessions);
     } catch (err) {
+      this.mylog('isAuthenticated() -> error:' + err.message)
       this.error('isAuthenticated() -> error', err.message);
       throw err;
     }
     if (Object.keys(sessions).length > 1) {
-      session.forEach(ses => {
-        let sessionId = Object.keys(ses)[0];
-        this.deleteOAuth2Client({
-          sessionId,
-          configId: ses.configId
-        });
+      this.log('_getSession() -> Found more than 1 session.');
+      Object.keys(sessions).forEach(ses => {
+        try {
+          this.log('_getSession() -> ',sessions[ses]);
+          this.log('_getSession() -> ',sessions[ses].configId);
+          let sessionId = ses
+          this.deleteOAuth2Client({
+            ses,
+            configId: sessions[ses].configId
+          });
+        } catch (e) {
+          this.mylog('Session: ' + e.message)
+        }
       });
       throw new Error('Multiple OAuth2 sessions found, not allowed.');
     }

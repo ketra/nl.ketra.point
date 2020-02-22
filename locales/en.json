@@ -8,7 +8,8 @@
     "logout_button": "Logout",
     "refresh_button": "Refresh Webhooks",
     "download_button": "Download History",
-    "logger_box": "Activate Debug Logging"
+    "logger_box": "Activate Debug Logging",
+    "delete_button": "Delete old hooks"
     },
   "tab1": {
     "title": "Dashboard",

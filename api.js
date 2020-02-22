@@ -59,6 +59,24 @@ module.exports = [
         },
     },
     {
+        description: 'Get Webhooks',
+        method: 'DELETE',
+        path: '/webhooks/',
+        fn: async (args, callback) => {
+            // Check if app.js is done
+            if (!Homey || !Homey.app || typeof Homey.app.RefreshWebhooks !== 'function') {
+                return callback(new Error(Homey.__('api.retry')));
+            }
+            // Try to get the authenticated state
+            try {
+                const webhooks = await Homey.app.DeleteOldWebhooks();
+                return callback(null, webhooks);
+            } catch (err) {
+                return callback(new Error(Homey.__('api.error_get_webhooks', { error: err.message || err.toString() })));
+            }
+        },
+    },
+    {
         description: 'Set logged in state',
         method: 'POST',
         path: '/login/',
