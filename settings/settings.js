@@ -1,8 +1,5 @@
 let _myLog;
 let mytimer;
-new Vue({
-    el: '#app'
-  });
   function showWebhooks(hooks) {
     let htmlstring = ""
     let headerstring = '<div class="rTableRow"><div class="rTableCell line rTableHead">HookID</div><div class="rTableCell line rTableHead">URL</div></div> '
@@ -78,6 +75,12 @@ new Vue({
         showLogin();
       }
     });
+    var LogValuesElement = document.getElementById('LogValues');
+
+    Homey.get('myLogActive', function( err, logging ) {
+             if( err ) return Homey.alert( err );
+             LogValuesElement.checked = logging;
+          });
     Homey.ready();
   }
   function refreshHistory() {
@@ -90,6 +93,13 @@ new Vue({
     {
       clearTimeout(mytimer);
     }
+}
+function setLogger(checked)
+{
+  console.log(`Logger set to ${checked}`);
+  Homey.set('myLogActive', checked, function( err ){
+    if( err ) return Homey.alert( err );
+  });
 }
   function showHistory(run) {
     Homey.get('myLog', function(err, logging){

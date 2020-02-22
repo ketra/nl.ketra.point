@@ -11,9 +11,11 @@ const PointOauthClient = require('./Lib/PointOauthClient');
 
 class PointApp extends OAuth2App {
 
+
   onOAuth2Init() {
     this.utils = new util();
-    this.enableOAuth2Debug();
+    this.logger_ative = false;
+    //this.enableOAuth2Debug();
     this.setOAuth2Config({
       client: PointOauthClient,
       clientId: Homey.env.CLIENT_ID,
@@ -26,6 +28,16 @@ class PointApp extends OAuth2App {
     this.log('PointApp is running...');
     this.log("Main", "App Started");
     Homey.ManagerSettings.set('myLog', '');
+    this.logger_ative = Homey.ManagerSettings.get('myLogActive');
+    Homey.ManagerSettings.on('set', function (setting) {
+      this.log(`setting changed ${setting}`)
+      if (setting === 'myLogActive')
+      {
+        let active = Homey.ManagerSettings.get('myLogActive');
+        this.log(`setting mylogactive to ${active}`)
+        Homey.app.logger_ative = active;
+      }
+    });
   }
 
   get MinutDriver() {
@@ -211,6 +223,8 @@ class PointApp extends OAuth2App {
   }
   async mylog(...message)
   {
+    let myLogActive = this.logger_ative
+    if (!myLogActive) return;
     let logdate = this.getDateTime();
     this.writeLog(logdate + ":" + message[0]);
     this.log(message);

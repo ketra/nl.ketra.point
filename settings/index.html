@@ -4,7 +4,6 @@
 <head>
   <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
   <script type="text/javascript" src="/manager/webserver/assets/js/jquery.js"></script>
-  <script type="text/javascript" src="vue.min.js" data-origin="settings"></script>
   <link rel="stylesheet" type="text/css" href="styles.css" />
   <script type="text/javascript" src="settings.js" data-origin="settings"></script>
 </head>
@@ -22,7 +21,9 @@
       <p data-i18n="settings.logout_intro"></p>
       <button id="logout_btn" data-i18n="settings.logout_button" onclick="logout()"></button>
       <button id="refreshhooks_btn" data-i18n="settings.refresh_button" onclick="refreshooks()"></button>
-      <button id="download_btn" data-i18n="settings.download_button" onclick="downloadHistory()"></button>
+      <button id="download_btn" data-i18n="settings.download_button" onclick="downloadHistory()"></button></br>
+      <label for="LogValues" data-i18n="settings.logger_box"></label>
+      <input type="checkbox" id="LogValues" onclick="setLogger(this.checked);">
     </div>
     <div id="webhooks" style="display:none;">
       <p data-i18n="settings.webhook_head"></p>
