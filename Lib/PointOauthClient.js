@@ -13,12 +13,12 @@ class PointOauthClient extends OAuth2Client {
   async getDevices() {
       this.log("Getting Devices");
       return this.get({
-          path: '/devices'
+          path: 'devices/'
       });
   }
   async getHomes() {
       return this.get({
-          path: '/homes'
+          path: 'homes/'
       });
   }
   async register_device(device) {
@@ -63,7 +63,7 @@ class PointOauthClient extends OAuth2Client {
       try {
         this.log('Got a webhook message!');
         Homey.app.mylog('Got a webhook message!');
-        //console.log(args)
+        console.log(args)
         this.log(`ID: ${args.body.event.id}`);
         this.log(`Created At: ${args.body.event.created_at}`);
         this.log(`type: ${args.body.event.type}`);
