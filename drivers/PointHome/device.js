@@ -15,13 +15,14 @@ class PointHome extends OAuth2Device {
         this.id = data.id;
         this.GetStatusInterval = setInterval(this._GetStateInfo.bind(this), 60 * 1000);
         this.registerCapabilityListener('locked', async (value) => {
+			var alarmpath = `homes/${this.id}/alarm/`
             if (value) {
                 this.log('Turning alarm on.');
-                return this.oAuth2Client.put({ path: `homes/${this.id}/alarm`, json: { alarm_status: "on" } });
+                return this.oAuth2Client.put({ path: alarmpath, json: { "alarm_status": "on", "alarm_mode": "manual" } });
             }
             else {
                 this.log('Turning alarm off.');
-                return this.oAuth2Client.put({ path: `homes/${this.id}/alarm`, json: { alarm_status: "off" } });
+                return this.oAuth2Client.put({ path: alarmpath, json: { "alarm_status": "off", "alarm_mode": "manual" } });
             }
         });
         this._GetStateInfo();
@@ -55,14 +56,14 @@ class PointHome extends OAuth2Device {
             .register()
             .registerRunListener((args, state) => {
                 this.log('Turning alarm on.');
-                return this.oAuth2Client.put({ path: `homes/${this.id}/alarm`, json: { alarm_status: "on" }});
+                return this.oAuth2Client.put({ path: `homes/${this.id}/alarm`, json: { "alarm_status": "on", "alarm_mode": "manual" }});
             });
         let set_alarm_off = new Homey.FlowCardAction('set_alarm_off');
         set_alarm_off
             .register()
             .registerRunListener((args, state) => {
                 this.log('Turning alarm off.');
-                return this.oAuth2Client.put({ path: `homes/${this.id}/alarm`, json: { alarm_status: "off" }});
+                return this.oAuth2Client.put({ path: `homes/${this.id}/alarm`, json: { "alarm_status": "off", "alarm_mode": "manual" }});
             });
     }
     _setState(status)
