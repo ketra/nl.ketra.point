@@ -97,8 +97,13 @@ class PointOauthClient extends OAuth2Client {
             break;
           case "alarm_grace_period_expired":
             this.log(`Motion Seen alarm triggering`);
+            this._flowTriggeralarm_Alarm_Motion.trigger(device, {}, {});
+            device.setCapabilityValue("alarm_motion", true);
+            break;
+		  case "pir_motion":
+            this.log(`Motion Seen`);
             this._flowTriggeralarm_Motion.trigger(device, {}, {});
-            this.setCapabilityValue("alarm_motion", true);
+            device.setCapabilityValue("alarm_motion", true);
             break;
           case "temperature_high":
             this.log("Triggering temperature_high");
@@ -205,7 +210,8 @@ class PointOauthClient extends OAuth2Client {
     this._flowTriggeralarm_online = new Homey.FlowCardTriggerDevice("device_online").register();
     this._flowTriggeralarm_Soundhigh = new Homey.FlowCardTriggerDevice("avg_sound_high").register();
     this._flowTriggeralarm_Soundnormal = new Homey.FlowCardTriggerDevice("avg_sound_normal").register();
-    this._flowTriggeralarm_Motion = new Homey.FlowCardTriggerDevice("alarm_grace_period_expired").register();
+    this._flowTriggeralarm_Alarm_Motion = new Homey.FlowCardTriggerDevice("alarm_grace_period_expired").register();
+	this._flowTriggeralarm_Motion = new Homey.FlowCardTriggerDevice("alarm_grace_period_expired").register();
     this._flowTriggeralarm_Tamper = new Homey.FlowCardTriggerDevice("Tamper").register();
   }
 

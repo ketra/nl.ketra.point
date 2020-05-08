@@ -102,6 +102,7 @@ class MinutDevice extends OAuth2Device {
     async _GetGeneralData() {
         let path = `devices/${this.id}`;
         this.oAuth2Client.getDeviceData(path).then((data) => {
+			console.log(data);
             this.setCapabilityValue('measure_battery', parseFloat(data.battery.percent))
             if (data.ongoing_events.includes("avg_sound_high"))
                 this.setCapabilityValue('alarm_Noise', true);
@@ -115,10 +116,8 @@ class MinutDevice extends OAuth2Device {
                 this.setCapabilityValue('alarm_Hum', true);
             else
                 this.setCapabilityValue('alarm_Hum', false);
-            if (data.ongoing_events.includes('alarm_grace_period_expired'))
-                this.setCapabilityValue('alarm_motion', true);
-            else
-                this.setCapabilityValue('alarm_motion', false);
+
+            this.setCapabilityValue('alarm_motion', false);
         });
     }
 
