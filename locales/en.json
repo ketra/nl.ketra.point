@@ -1,1 +1,24 @@
-{}
+{
+  "settings": {
+    "title": "Minut Account",
+    "login_intro": "Click here to login with your Minut account.",
+    "login_button": "Login",
+    "logged_in": "You are currently logged in.",
+    "logout_intro": "Click here to logout.",
+    "logout_button": "Logout",
+    "refresh_button": "Refresh Webhooks",
+    "download_button": "Download History",
+    "logger_box": "Activate Debug Logging",
+    "delete_button": "Delete old hooks"
+    },
+  "tab1": {
+    "title": "Dashboard",
+    "history": {
+        "date": "Date",
+        "time": "Time",
+        "smode": "Toezicht Mode",
+        "source": "Source",
+        "action": "Actie"
+    }
+}
+}
