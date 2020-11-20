@@ -173,8 +173,8 @@ class PointOauthClient extends OAuth2Client {
             this.log("Triggering device_online");
             this._flowTriggeralarm_online.trigger(device, {}, {});
             break;
-          case "tamper":
-            this.log("Triggering tamper");
+          case "tamper_removed":
+            this.log("Triggering tamper_removed");
             this._flowTriggeralarm_Tamper.trigger(device, {}, {});
             break;
           case "battery_low":
@@ -182,6 +182,18 @@ class PointOauthClient extends OAuth2Client {
             break;
           case "battery_empty":
             this.log("Triggering battery_empty");
+            break;
+          case "disturbance_first_notice":
+            this.log("Tiggering Disturbance Notice");
+            this._flowTriggerDisturbance(device, { "Notice": 1}, {});
+            break;
+          case "disturbance_second_notice":
+            this.log("Tiggering Disturbance Notice");
+            this._flowTriggerDisturbance(device, { "Notice": 2}, {});
+            break;
+          case "disturbance_third_notice":
+            this.log("Tiggering Disturbance Notice");
+            this._flowTriggerDisturbance(device, { "Notice": 3}, {});
             break;
           default:
             this._flowTriggerGenericAlarm.trigger(device, {
@@ -213,6 +225,7 @@ class PointOauthClient extends OAuth2Client {
     this._flowTriggeralarm_Alarm_Motion = new Homey.FlowCardTriggerDevice("alarm_grace_period_expired").register();
 	this._flowTriggeralarm_Motion = new Homey.FlowCardTriggerDevice("alarm_grace_period_expired").register();
     this._flowTriggeralarm_Tamper = new Homey.FlowCardTriggerDevice("Tamper").register();
+    this._flowTriggerDisturbance = new Homey.FlowCardTriggerDevice("disturbance_notice").register();
   }
 
   async postWebhook() {

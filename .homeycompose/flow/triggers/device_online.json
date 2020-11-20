@@ -1,0 +1,14 @@
+{
+  "id": "device_online",
+  "title": {
+    "en": "Device online",
+    "nl": "Apparaat online"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ]
+}

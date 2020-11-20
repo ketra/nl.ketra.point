@@ -1,0 +1,14 @@
+{
+  "id": "Tamper",
+  "title": {
+    "en": "Tamper Alarm Triggered",
+    "nl": "Tamper beveliging afgegaan"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ]
+}

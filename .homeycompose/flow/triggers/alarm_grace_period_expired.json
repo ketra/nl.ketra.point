@@ -1,0 +1,14 @@
+{
+  "id": "alarm_grace_period_expired",
+  "title": {
+    "en": "Motion while alarm enabled",
+    "nl": "Beweging tijdens alarm"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ]
+}

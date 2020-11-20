@@ -1,0 +1,14 @@
+      {
+        "id": "disturbance_monitoring_inactive",
+        "title": {
+          "en": "Deactivate Disturbance Monitoring",
+          "nl": "Deactiveer Onrust Monitoring"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=PointHome"
+          }
+        ]
+      }

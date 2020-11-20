@@ -1,0 +1,14 @@
+{
+  "id": "alarm_heard",
+  "title": {
+    "en": "An alarm was heard.",
+    "nl": "Een alarm gehoord"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ]
+}

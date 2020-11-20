@@ -1,0 +1,29 @@
+{
+  "id": "PointHome",
+  "name": "Point Home",
+  "class": "homealarm",
+  "capabilities": [
+    "locked"
+  ],
+  "images": {
+    "large": "/drivers/Point/assets/images/large.png",
+    "small": "/drivers/Point/assets/images/small.png"
+  },
+  "pair": [
+    {
+      "id": "login_oauth2",
+      "template": "login_oauth2"
+    },
+    {
+      "id": "list_devices",
+      "template": "list_devices_singular",
+      "navigation": {
+        "next": "add_devices"
+      }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ]
+}

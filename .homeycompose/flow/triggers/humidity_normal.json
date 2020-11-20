@@ -1,0 +1,25 @@
+{
+  "id": "humidity_normal",
+  "title": {
+    "en": "Humidity back to normal",
+    "nl": "Luchtvochtigheid terug naar normaal"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "Humidity",
+      "type": "number",
+      "title": {
+        "en": "Humidity",
+        "nl": "Luchtvochtigheid"
+      },
+      "example": 1057.5
+    }
+  ]
+}

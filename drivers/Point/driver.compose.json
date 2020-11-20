@@ -1,0 +1,115 @@
+{
+  "id": "Point",
+  "name": "Minut Point",
+  "class": "sensor",
+  "capabilities": [
+    "measure_battery",
+    "measure_temperature",
+    "measure_humidity",
+    "measure_noise",
+    "measure_pressure",
+    "measure_luminance",
+    "alarm_Hum",
+    "alarm_Temp",
+    "alarm_Noise",
+    "alarm_motion"
+  ],
+  "energy": {
+    "batteries": [
+      "INTERNAL"
+    ]
+  },
+  "images": {
+    "large": "/drivers/Point/assets/images/large.png",
+    "small": "/drivers/Point/assets/images/small.png"
+  },
+  "mobile": {
+    "components": [
+      {
+        "id": "sensor",
+        "capabilities": [
+          "measure_battery",
+          "measure_temperature",
+          "measure_humidity",
+          "measure_noise",
+          "measure_pressure",
+          "measure_luminance",
+          "alarm_Hum",
+          "alarm_Temp",
+          "alarm_Noise",
+          "alarm_motion"
+        ],
+        "options": {
+          "icons": {
+            "LoudNoise": "/drivers/Point/assets/icons/LoudNoise.svg",
+            "HumAlarm": "/drivers/Point/assets/icons/HumAlarm.svg",
+            "TempAlarm": "/drivers/Point/assets/icons/TempAlarm.svg"
+          },
+          "LoudNoise": {
+            "label": {
+              "true": {
+                "en": "Loud Noise Heard"
+              },
+              "false": {
+                "en": "All is quiet"
+              }
+            }
+          },
+          "HumAlarm": {
+            "label": {
+              "true": {
+                "en": "Abnormal Humidity"
+              },
+              "false": {
+                "en": "Humidity normal"
+              }
+            }
+          },
+          "TempAlarm": {
+            "label": {
+              "true": {
+                "en": "Abnormal temperature"
+              },
+              "false": {
+                "en": "Normal Temp"
+              }
+            }
+          },
+          "MotionAlarm": {
+            "label": {
+              "true": {
+                "en": "Motion Seen"
+              },
+              "false": {
+                "en": "All is quiet"
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "battery",
+        "capabilities": [
+          "measure_battery"
+        ]
+      }
+    ]
+  },
+  "pair": [
+    {
+      "id": "login_oauth2",
+      "template": "login_oauth2"
+    },
+    {
+      "id": "list_devices",
+      "template": "list_devices_singular",
+      "navigation": {
+        "next": "add_devices"
+      }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ]
+}

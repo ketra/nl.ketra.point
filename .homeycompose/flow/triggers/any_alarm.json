@@ -1,0 +1,25 @@
+{
+  "id": "any_alarm",
+  "title": {
+    "en": "an alarm was triggered",
+    "nl": "er is een alarm"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "Alarm",
+      "type": "string",
+      "title": {
+        "en": "Type of alarm",
+        "nl": "Type alarm"
+      },
+      "example": "Alarm_heard"
+    }
+  ]
+}
