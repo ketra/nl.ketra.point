@@ -22,5 +22,8 @@
   },
   "1.1.0": {
     "en": "Added noise monitoring support"
+  },
+  "1.1.1": {
+    "en": "Changed some language items to be more clear"
   }
 }

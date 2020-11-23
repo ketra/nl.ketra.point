@@ -1,6 +1,6 @@
 {
   "id": "com.ketra.point",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "compatibility": ">=2.5.0",
   "sdk": 2,
   "name": {
@@ -162,8 +162,8 @@
       {
         "id": "disturbance_notice",
         "title": {
-          "en": "Disturbance monitoring Triggered",
-          "nl": "onrust alarm afgegaan"
+          "en": "Noise monitoring Triggered",
+          "nl": "lawaai alarm afgegaan"
         },
         "args": [
           {
