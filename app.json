@@ -1,6 +1,6 @@
 {
   "id": "com.ketra.point",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "compatibility": ">=2.5.0",
   "sdk": 2,
   "name": {
@@ -181,6 +181,20 @@
               "nl": "Eerste, Tweede, of Derde"
             },
             "example": 1
+          }
+        ]
+      },
+      {
+        "id": "glassbreak",
+        "title": {
+          "en": "Glassbreak Detected.",
+          "nl": "Glasbreuk Gedectecteerd."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=Point"
           }
         ]
       },
