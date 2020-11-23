@@ -14,6 +14,9 @@ there are 2 devices added by this app:
     * High/low temperature.
     * High/low humidity.
     * High/low sound.
+    * Noise
+    * Glassbreak
+    * motion.
 * PointHome:
   * Read Data for:
     * Alarm State.
@@ -21,8 +24,5 @@ there are 2 devices added by this app:
     * change of alarm state
 
 Changelog:
-  * migrated to new webhook (added button to remove old)
-  * added option to disable live logging to reduce memory 
-  * New app name.
-  * New app images
-  * reduced memory usage
+- 1.1.0: Support for noise montoring added.
+- 1.0.9: Support for motion added.

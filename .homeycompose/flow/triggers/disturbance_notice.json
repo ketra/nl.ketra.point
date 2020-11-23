@@ -1,8 +1,8 @@
 {
   "id": "disturbance_notice",
   "title": {
-    "en": "Disturbance monitoring Triggered",
-    "nl": "onrust alarm afgegaan"
+    "en": "Noise monitoring Triggered",
+    "nl": "lawaai alarm afgegaan"
   },
   "args": [
     {
