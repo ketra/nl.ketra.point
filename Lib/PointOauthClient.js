@@ -177,6 +177,10 @@ class PointOauthClient extends OAuth2Client {
             this.log("Triggering tamper_removed");
             this._flowTriggeralarm_Tamper.trigger(device, {}, {});
             break;
+          case "glassbreak":
+            this.log("Triggering tamper_removed");
+            this._flowTriggeralarm_glassbreak.trigger(device, {}, {});
+            break;
           case "battery_low":
             this.log("Triggering battery_low");
             break;
@@ -226,6 +230,7 @@ class PointOauthClient extends OAuth2Client {
 	this._flowTriggeralarm_Motion = new Homey.FlowCardTriggerDevice("alarm_grace_period_expired").register();
     this._flowTriggeralarm_Tamper = new Homey.FlowCardTriggerDevice("Tamper").register();
     this._flowTriggerDisturbance = new Homey.FlowCardTriggerDevice("disturbance_notice").register();
+    this._flowTriggeralarm_glassbreak = new Homey.FlowCardTriggerDevice("glassbreak").register();
   }
 
   async postWebhook() {
