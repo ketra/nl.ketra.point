@@ -46,12 +46,4 @@ Ondersteunde talen:
 * Engels
 * Nederlands
 
-Release opmerkingen:
-* versie 1.2.0
-  * Ondersteuning toegevoegd voor detectie van glasbreuk
-  * Toevoegen NL readme.
-* versie 1.0.9
-  * los probleem met alarmbeweging op
-* versie 1.0.8
-  * Ondersteuning toegevoegd voor bewegingsdetectie
   

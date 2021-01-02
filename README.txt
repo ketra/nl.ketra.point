@@ -45,11 +45,3 @@ You can make flows which arm/disarm Minuts based on Heimdall alarm state
 Supported Languages:
 * English    
 * Dutch    
-
-Release notes:
-* version 1.2.0
-  * Adds support for Glass break detection
-* version 1.0.9
-  * fix issue with alarm motion
-* version 1.0.8
-  * Added support for motion detection
