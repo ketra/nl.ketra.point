@@ -1,0 +1,25 @@
+{
+  "id": "humidity_low",
+  "title": {
+    "en": "Low humidity",
+    "nl": "Lage luchtvochtigheid"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "Humidity",
+      "type": "number",
+      "title": {
+        "en": "Humidity",
+        "nl": "Luchtvochtigheid"
+      },
+      "example": 1057.5
+    }
+  ]
+}

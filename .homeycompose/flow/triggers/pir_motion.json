@@ -1,0 +1,14 @@
+{
+  "id": "pir_motion",
+  "title": {
+    "en": "Motion was seen",
+    "nl": "Beweging gedetecteerd."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ]
+}

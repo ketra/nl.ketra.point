@@ -1,0 +1,25 @@
+{
+  "id": "disturbance_notice",
+  "title": {
+    "en": "Noise monitoring Triggered",
+    "nl": "lawaai alarm afgegaan"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "Notice",
+      "type": "number",
+      "title": {
+        "en": "First, Second, Or Thrird.",
+        "nl": "Eerste, Tweede, of Derde"
+      },
+      "example": 1
+    }
+  ]
+}

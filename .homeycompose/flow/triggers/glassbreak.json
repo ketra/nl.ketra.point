@@ -1,0 +1,14 @@
+{
+  "id": "glassbreak",
+  "title": {
+    "en": "Glassbreak Detected.",
+    "nl": "Glasbreuk Gedectecteerd."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ]
+}

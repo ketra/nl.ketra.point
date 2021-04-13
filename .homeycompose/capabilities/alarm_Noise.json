@@ -1,0 +1,9 @@
+{
+    "type": "boolean",
+    "title": {
+      "en": "Loud noise"
+    },
+    "getable": true,
+    "setable": false,
+    "icon": "/drivers/Point/assets/icons/LoudNoise.svg"
+}

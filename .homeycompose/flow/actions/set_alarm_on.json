@@ -1,0 +1,14 @@
+{
+  "id": "set_alarm_on",
+  "title": {
+    "en": "Alarm ON",
+    "nl": "Alarm Aan"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=PointHome"
+    }
+  ]
+}

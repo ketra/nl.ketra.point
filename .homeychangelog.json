@@ -1,8 +1,35 @@
 {
+  "1.0.0": {
+    "en": "New oauth client new app name"
+  },
+  "1.0.2": {
+    "en": "fixed webhooks, wrong check"
+  },
+  "1.0.4": {
+    "en": "Fixed webhooks, added more options on settings page"
+  },
+  "1.0.5": {
+    "en": "added options to remove old hooks and for reduced memory usage"
+  },
+  "1.0.6": {
+    "en": "fixed an error while adding devices"
+  },
   "1.0.8": {
     "en": "Added support for motion"
   },
   "1.0.9": {
     "en": "fix issue with alarm motion"
+  },
+  "1.1.0": {
+    "en": "Added noise monitoring support"
+  },
+  "1.1.1": {
+    "en": "Changed some language items to be more clear"
+  },
+  "1.2.0": {
+    "en": "Added Glassbreak"
+  },
+  "1.2.1": {
+    "en": "Readme improved, motion added"
   }
 }

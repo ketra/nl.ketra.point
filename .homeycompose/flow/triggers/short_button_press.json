@@ -1,0 +1,14 @@
+{
+  "id": "short_button_press",
+  "title": {
+    "en": "Button was pressed",
+    "nl": "De knop was ingedrukt."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ]
+}

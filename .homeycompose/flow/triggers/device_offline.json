@@ -1,0 +1,14 @@
+{
+  "id": "device_offline",
+  "title": {
+    "en": "Device offline",
+    "nl": "Apparaat offline"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ]
+}

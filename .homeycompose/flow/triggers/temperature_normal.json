@@ -1,0 +1,25 @@
+{
+  "id": "temperature_normal",
+  "title": {
+    "en": "Temperature back to normal",
+    "nl": "Temperatuur terug naar normaal"
+  },
+  "tokens": [
+    {
+      "name": "temperature",
+      "type": "number",
+      "title": {
+        "en": "Temp",
+        "nl": "Temp"
+      },
+      "example": 20.1
+    }
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+      {
+        "id": "disturbance_monitoring_active",
+        "title": {
+          "en": "Activate Disturbance Monitoring",
+          "nl": "Activeer Onrust Monitoring"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=PointHome"
+          }
+        ]
+      }

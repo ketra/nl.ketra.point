@@ -1,0 +1,25 @@
+{
+  "id": "avg_sound_normal",
+  "title": {
+    "en": "Sound back to normal",
+    "nl": "Geluid terug naar normaal"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=Point"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "Sound",
+      "type": "number",
+      "title": {
+        "en": "Sound (dB)",
+        "nl": "Geluid (dB)"
+      },
+      "example": 60.5
+    }
+  ]
+}

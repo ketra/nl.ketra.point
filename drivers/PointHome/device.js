@@ -42,6 +42,7 @@ class PointHome extends OAuth2Device {
     async _GetStateInfo() {
         this.log(`processing Data for Pointhome ${this.id}`);
         this.oAuth2Client.getDeviceData(`homes/${this.id}`).then((data) => {
+            this.log(data.disturbance_monitoring_active);
             this.log(`alarm has state ${data.alarm_status}`)
             if (data.alarm_status === "off")
                 this.setCapabilityValue('locked', false);
@@ -64,6 +65,18 @@ class PointHome extends OAuth2Device {
             .registerRunListener((args, state) => {
                 this.log('Turning alarm off.');
                 return this.oAuth2Client.put({ path: `homes/${this.id}/alarm`, json: { "alarm_status": "off", "alarm_mode": "manual" }});
+            });
+        let disturbance_monitoring_active = new Homey.FlowCardAction("disturbance_monitoring_active");
+        disturbance_monitoring_active.register()
+            .registerRunListener((args, state) => {
+                this.log('Turning disturbance alarm on.');
+                return this.oAuth2Client.put({ path: `homes/${this.id}`, json: { "disturbance_monitoring_active": true }});
+            });
+        let disturbance_monitoring_inactive = new Homey.FlowCardAction("disturbance_monitoring_inactive");
+        disturbance_monitoring_inactive.register()
+            .registerRunListener((args, state) => {
+                this.log('Turning disturbance alarm off.');
+                return this.oAuth2Client.put({ path: `homes/${this.id}`, json: { "disturbance_monitoring_active": false }});
             });
     }
     _setState(status)
