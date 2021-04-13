@@ -1,7 +1,7 @@
 const Homey = require('homey');
 const utils = require('../../Lib/utils');
 const { OAuth2Device, OAuth2Token, OAuth2Util } = require('homey-oauth2app');
-const POLL_INTERVAL = 60 * 1000;
+const POLL_INTERVAL = 900 * 1000;
 
 const actions = {
   temperature: "measure_temperature",
@@ -21,9 +21,9 @@ class MinutDevice extends OAuth2Device {
     async readyDevice() {
         this.id = this.getData().id;
         await this.oAuth2Client.register_device(this);
-        this.GetStatusInterval = setInterval(this._GetStateInfo.bind(this), 60 * 1000);
+        this.GetStatusInterval = setInterval(this._GetStateInfo.bind(this), POLL_INTERVAL);
         this.log(`token = ${this.oAuth2Client.getToken().access_token}`);
-        Homey.app.mylog(`token = ${this.oAuth2Client.getToken().access_token}`);
+        this.homey.app.mylog(`token = ${this.oAuth2Client.getToken().access_token}`);
         await this.oAuth2Client.registerWebhookSubscription();
         await this.oAuth2Client.RegisterFlows();
         this._GetStateInfo();
@@ -73,10 +73,10 @@ class MinutDevice extends OAuth2Device {
 
     async _GetStateInfo() {
         this.log(`processing Data for PointDevice ${this.id}`);
-        Homey.app.mylog(`processing Data for PointDevice ${this.id}`);
-        for (let action in actions) {
-            this._GetDataForAction(action, actions[action]);
-        }
+        this.homey.app.mylog(`processing Data for PointDevice ${this.id}`);
+        //for (let action in actions) {
+        //    this._GetDataForAction(action, actions[action]);
+        //}
         this._GetGeneralData();
     }
 
@@ -90,20 +90,26 @@ class MinutDevice extends OAuth2Device {
                 var value = data.values[data.values.length - 1]
                 let collectiontime = new Date(value.datetime);
                 this.log(`Collecting ${action}  With Date ${collectiontime.toLocaleString()} And value ${value.value}`);
-                Homey.app.mylog(`Collecting ${action}  With Date ${collectiontime.toLocaleString()} And value ${value.value}`);
+                this.homey.app.mylog(`Collecting ${action}  With Date ${collectiontime.toLocaleString()} And value ${value.value}`);
                 this.setCapabilityValue(capability, parseFloat(value.value));
             } else {
                 this.log(`No Data found for ${action}`);
-                Homey.app.mylog(`No Data found for ${action}`);
+                this.homey.app.mylog(`No Data found for ${action}`);
             }
         });
     }
 
     async _GetGeneralData() {
+        this.log(`Collecting data for ${this.id}`)
         let path = `devices/${this.id}`;
         this.oAuth2Client.getDeviceData(path).then((data) => {
-			console.log(data);
+			//console.log(data);
+			this.setCapabilityValue('measure_temperature', parseFloat(data.latest_sensor_values.temperature.value))
+            this.setCapabilityValue('measure_humidity', parseFloat(data.latest_sensor_values.humidity.value))
+            this.setCapabilityValue('measure_pressure', parseFloat(data.latest_sensor_values.pressure.value))
+            this.setCapabilityValue('measure_noise', parseFloat(data.latest_sensor_values.sound.value))
             this.setCapabilityValue('measure_battery', parseFloat(data.battery.percent))
+
             if (data.ongoing_events.includes("avg_sound_high"))
                 this.setCapabilityValue('alarm_Noise', true);
             else
@@ -129,8 +135,8 @@ class MinutDevice extends OAuth2Device {
 
         // Check if client exists then bind it to this instance
         let client;
-        if (Homey.app.hasOAuth2Client({ configId, sessionId })) {
-            client = Homey.app.getOAuth2Client({ configId, sessionId });
+        if (this.homey.app.hasOAuth2Client({ configId, sessionId })) {
+            client = this.homey.app.getOAuth2Client({ configId, sessionId });
         } else {
             this.error('OAuth2Client reset failed');
             return this.setUnavailable(Homey.__('authentication.re-login_failed'));
@@ -139,7 +145,7 @@ class MinutDevice extends OAuth2Device {
         // Rebind new oAuth2Client
         this.oAuth2Client = client;
         this.log(`Bound new client setting availible`);
-        Homey.app.mylog(`Bound new client setting availible`);
+        this.homey.app.mylog(`Bound new client setting availible`);
 
 
 

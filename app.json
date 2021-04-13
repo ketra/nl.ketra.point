@@ -1,8 +1,9 @@
 {
   "id": "com.ketra.point",
   "version": "1.2.1",
-  "compatibility": ">=2.5.0",
-  "sdk": 2,
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "brandColor": "#193646",
   "name": {
     "en": "Minut Smart Home Alarm"
   },
@@ -25,6 +26,28 @@
   "author": {
     "name": "Kevin Traa",
     "email": "ketra90@gmail.com"
+  },
+  "api": {
+    "GetLogin": {
+      "method": "get",
+      "path": "/login"
+    },
+    "PostLogin": {
+      "method": "post",
+      "path": "/login"
+    },
+    "GetWebhooks": {
+      "method": "get",
+      "path": "/webhooks"
+    },
+    "PostWebhooks": {
+      "method": "post",
+      "path": "/webhooks"
+    },
+    "DeleteWebhooks": {
+      "method": "delete",
+      "path": "/webhooks"
+    }
   },
   "flow": {
     "triggers": [
