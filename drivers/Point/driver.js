@@ -17,7 +17,8 @@ module.exports = class MinutDriver extends OAuth2Driver {
         return oAuth2Client.getDevices()
             .then(result => {
                 this.log(`got ${result.devices.length} devices`);
-                Homey.app.mylog(`got ${result.devices.length} devices`);
+                this.homey.app.mylog(`got ${result.devices.length} devices`);
+                this.log(result)
                 if (Array.isArray(result.devices)) {
                     return result.devices.map(device => ({
                         name: device.description,

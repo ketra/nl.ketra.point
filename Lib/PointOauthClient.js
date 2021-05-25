@@ -5,6 +5,12 @@ const Homey = require('homey');
 const devices = [];
 class PointOauthClient extends OAuth2Client {
 
+  // Required:
+  static OAUTH2_CLIENT = PointOauthClient; // Default: OAuth2Client
+  static API_URL = 'https://api.minut.com/v5/';
+  static TOKEN_URL = 'https://api.minut.com/v5/oauth/token';
+  static AUTHORIZATION_URL = 'https://api.minut.com/v5/oauth/authorize';
+
   async getDeviceData(uri) {
       return this.get({
           path: uri
@@ -13,7 +19,8 @@ class PointOauthClient extends OAuth2Client {
   async getDevices() {
       this.log("Getting Devices");
       return this.get({
-          path: 'devices/'
+          path: 'devices/',
+          query: { "active": true },
       });
   }
   async getHomes() {
@@ -23,38 +30,38 @@ class PointOauthClient extends OAuth2Client {
   }
   async register_device(device) {
     this.log(`Register ${device.id}`);
-    Homey.app.mylog(`Register ${device.id}`);
+    this.homey.app.mylog(`Register ${device.id}`);
     devices.push(device);
   }
 
   async delete_device(device) {
     this.log(`deRegister ${device.id}`);
-    Homey.app.mylog(`deRegister ${device.id}`);
+    this.homey.app.mylog(`deRegister ${device.id}`);
     devices.splice(devices.indexOf(device), 1);
   }
 
   get_device(device_id) {
     this.log(`Looking for dev ${device_id}`);
-    Homey.app.mylog(`Looking for dev ${device_id}`);
+    this.homey.app.mylog(`Looking for dev ${device_id}`);
     let dev = devices.find(x => x.id === device_id);
     this.log(`Found device ${dev.id}`);
-    Homey.app.mylog(`Found device ${dev.id}`);
+    this.homey.app.mylog(`Found device ${dev.id}`);
     return dev;
   }
 
-  AttachWebhookListener(data) {
+  async AttachWebhookListener(data) {
     this.log(`Attached listener to ${data.hook_id}`)
-    Homey.app.mylog(`Attached listener to ${data.hook_id}`)
-    const debouncedMessageHandler = debounce(this._webhookhandler.bind(this), 500, true);
-      return new Homey.CloudWebhook(Homey.env.WEBHOOK_ID, Homey.env.WEBHOOK_SECRET, data)
-          .on('message', debouncedMessageHandler)
-          .register();
+    this.homey.app.mylog(`Attached listener to ${data.hook_id}`)
+    const debouncedMessageHandler = debounce(this._webhookhandler.bind(this), 500, true)
+    let myWebhook = await this.homey.cloud.createWebhook(Homey.env.WEBHOOK_ID, Homey.env.WEBHOOK_SECRET, data)
+    myWebhook.on('message', debouncedMessageHandler)
+    return myWebhook
   }
 
   _webhookhandler(args) {
       let datetime = new Date().getTime();
     this.log('_webhookhandler', datetime);
-    Homey.app.mylog('_webhookhandler', datetime);
+    this.homey.app.mylog('_webhookhandler', datetime);
     //console.log(data)
     // Data needs to be unwrapped
     if (args && args.hasOwnProperty('body')) {
@@ -62,16 +69,16 @@ class PointOauthClient extends OAuth2Client {
       //this.log(args.body);
       try {
         this.log('Got a webhook message!');
-        Homey.app.mylog('Got a webhook message!');
+        this.homey.app.mylog('Got a webhook message!');
         console.log(args)
         this.log(`ID: ${args.body.event.id}`);
         this.log(`Created At: ${args.body.event.created_at}`);
         this.log(`type: ${args.body.event.type}`);
         this.log(`Device: ${args.body.event.device_id}`);
-        Homey.app.mylog(`ID: ${args.body.event.id}`);
-        Homey.app.mylog(`Created At: ${args.body.event.created_at}`);
-        Homey.app.mylog(`type: ${args.body.event.type}`);
-        Homey.app.mylog(`Device: ${args.body.event.device_id}`);
+        this.homey.app.mylog(`ID: ${args.body.event.id}`);
+        this.homey.app.mylog(`Created At: ${args.body.event.created_at}`);
+        this.homey.app.mylog(`type: ${args.body.event.type}`);
+        this.homey.app.mylog(`Device: ${args.body.event.device_id}`);
         let device = this.get_device(args.body.event.device_id);
         if (!device) {
           this.log("device undefinded?");
@@ -137,7 +144,7 @@ class PointOauthClient extends OAuth2Client {
             break;
           case "humidity_low":
             this.log("Triggering humidity_low");
-            this._flowTriggerHumHigh.trigger(device, {
+            this._flowTriggerHumLow.trigger(device, {
               "Humidity": sensor_value
             }, {});
             break;
@@ -213,24 +220,24 @@ class PointOauthClient extends OAuth2Client {
   }
 
   RegisterFlows() {
-    this._flowTriggerGenericAlarm = new Homey.FlowCardTriggerDevice('any_alarm').register();
-    this._flowTriggeralarm_heard = new Homey.FlowCardTriggerDevice('alarm_heard').register();
-    this._flowTriggeralarm_Button = new Homey.FlowCardTriggerDevice("short_button_press").register();
-    this._flowTriggerTempHigh = new Homey.FlowCardTriggerDevice('temperature_high').register();
-    this._flowTriggerTempLow = new Homey.FlowCardTriggerDevice('temperature_low').register();
-    this._flowTriggerTempnormal = new Homey.FlowCardTriggerDevice('temperature_normal').register();
-    this._flowTriggerHumLow = new Homey.FlowCardTriggerDevice('humidity_low').register();
-    this._flowTriggerHumHigh = new Homey.FlowCardTriggerDevice('humidity_high').register();
-    this._flowTriggerHumNormal = new Homey.FlowCardTriggerDevice("humidity_normal").register();
-    this._flowTriggeralarm_offline = new Homey.FlowCardTriggerDevice("device_offline").register();
-    this._flowTriggeralarm_online = new Homey.FlowCardTriggerDevice("device_online").register();
-    this._flowTriggeralarm_Soundhigh = new Homey.FlowCardTriggerDevice("avg_sound_high").register();
-    this._flowTriggeralarm_Soundnormal = new Homey.FlowCardTriggerDevice("avg_sound_normal").register();
-    this._flowTriggeralarm_Alarm_Motion = new Homey.FlowCardTriggerDevice("alarm_grace_period_expired").register();
-	this._flowTriggeralarm_Motion = new Homey.FlowCardTriggerDevice("alarm_grace_period_expired").register();
-    this._flowTriggeralarm_Tamper = new Homey.FlowCardTriggerDevice("Tamper").register();
-    this._flowTriggerDisturbance = new Homey.FlowCardTriggerDevice("disturbance_notice").register();
-    this._flowTriggeralarm_glassbreak = new Homey.FlowCardTriggerDevice("glassbreak").register();
+    this._flowTriggerGenericAlarm = this.homey.flow.getDeviceTriggerCard('any_alarm');
+    this._flowTriggeralarm_heard = this.homey.flow.getDeviceTriggerCard('alarm_heard');
+    this._flowTriggeralarm_Button = this.homey.flow.getDeviceTriggerCard("short_button_press");
+    this._flowTriggerTempHigh = this.homey.flow.getDeviceTriggerCard('temperature_high');
+    this._flowTriggerTempLow = this.homey.flow.getDeviceTriggerCard('temperature_low');
+    this._flowTriggerTempnormal = this.homey.flow.getDeviceTriggerCard('temperature_normal');
+    this._flowTriggerHumLow = this.homey.flow.getDeviceTriggerCard('humidity_low');
+    this._flowTriggerHumHigh = this.homey.flow.getDeviceTriggerCard('humidity_high');
+    this._flowTriggerHumNormal = this.homey.flow.getDeviceTriggerCard("humidity_normal");
+    this._flowTriggeralarm_offline = this.homey.flow.getDeviceTriggerCard("device_offline");
+    this._flowTriggeralarm_online = this.homey.flow.getDeviceTriggerCard("device_online");
+    this._flowTriggeralarm_Soundhigh = this.homey.flow.getDeviceTriggerCard("avg_sound_high");
+    this._flowTriggeralarm_Soundnormal = this.homey.flow.getDeviceTriggerCard("avg_sound_normal");
+    this._flowTriggeralarm_Alarm_Motion = this.homey.flow.getDeviceTriggerCard("alarm_grace_period_expired");
+	this._flowTriggeralarm_Motion = this.homey.flow.getDeviceTriggerCard("alarm_grace_period_expired");
+    this._flowTriggeralarm_Tamper = this.homey.flow.getDeviceTriggerCard("Tamper");
+    this._flowTriggerDisturbance = this.homey.flow.getDeviceTriggerCard("disturbance_notice");
+    this._flowTriggeralarm_glassbreak = this.homey.flow.getDeviceTriggerCard("glassbreak");
   }
 
   async postWebhook() {
@@ -243,11 +250,11 @@ class PointOauthClient extends OAuth2Client {
         }
       });
       this.log(`Created webhook ${webhook.hook_id}`);
-      Homey.app.mylog(`Created webhook ${webhook.hook_id}`);
+      this.homey.app.mylog(`Created webhook ${webhook.hook_id}`);
       this.AttachWebhookListener(webhook);
     } catch (err) {
       this.error('failed to register webhook subscription', err.message);
-      Homey.app.mylog('failed to register webhook subscription', err.message);
+      this.homey.app.mylog('failed to register webhook subscription', err.message);
       // Pass error
       throw err;
     }
@@ -257,12 +264,12 @@ class PointOauthClient extends OAuth2Client {
   {
       try {
         let webhooks = await this.getDeviceData(`webhooks`);
-        //let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === Homey.env.WEBHOOK_URL);
+        //let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === this.homey.env.WEBHOOK_URL);
         return webhooks.hooks;
       }
       catch (err) {
       this.error('failed to get existing subscriptions', err.message);
-      Homey.app.mylog('failed to get existing subscriptions', err.message);
+      this.homey.app.mylog('failed to get existing subscriptions', err.message);
     }
   }
 
@@ -272,10 +279,10 @@ class PointOauthClient extends OAuth2Client {
     {
       let webhooks = await this.getDeviceData(`webhooks`);
       let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === Homey.env.OLD_WEBHOOK_URL);
-      Homey.app.mylog(`deleting old webhooks.`);
+      this.homey.app.mylog(`deleting old webhooks.`);
       var self = this;
       mywebhooks.forEach(function(webhook) {
-        Homey.app.mylog(`deleting ${webhook.hook_id}`);
+        this.homey.app.mylog(`deleting ${webhook.hook_id}`);
         self.delete({
             path: `webhooks/${webhook.hook_id}`
         });
@@ -285,7 +292,7 @@ class PointOauthClient extends OAuth2Client {
     catch (err)
     {
       this.error(err);
-      Homey.app.mylog(err);
+      this.homey.app.mylog(err);
     }
   }
 
@@ -295,10 +302,10 @@ class PointOauthClient extends OAuth2Client {
     {
       let webhooks = await this.getDeviceData(`webhooks`);
       let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === Homey.env.WEBHOOK_URL);
-      Homey.app.mylog(`deleting all webhooks.`);
+      this.homey.app.mylog(`deleting all webhooks.`);
       var self = this;
       mywebhooks.forEach(function(webhook) {
-        Homey.app.mylog(`deleting ${webhook.hook_id}`);
+        self.homey.app.log(`deleting ${webhook.hook_id}`);
         self.delete({
             path: `webhooks/${webhook.hook_id}`
         });
@@ -309,7 +316,7 @@ class PointOauthClient extends OAuth2Client {
     catch (err)
     {
       this.error(err);
-      Homey.app.mylog(err);
+      this.homey.app.mylog(err);
     }
   }
 
@@ -322,7 +329,7 @@ class PointOauthClient extends OAuth2Client {
     let webhookIsRegistered = false;
 
     this.log('registerWebhookSubscription()');
-    Homey.app.mylog('registerWebhookSubscription()');
+    this.homey.app.mylog('registerWebhookSubscription()');
 
     // Refresh webhooks after 15 minutes of inactivity
     clearTimeout(this._registerWebhookSubscriptionTimeout);
@@ -331,14 +338,14 @@ class PointOauthClient extends OAuth2Client {
     // TODO: get current webhook
     try {
       let webhooks = await this.getDeviceData(`webhooks`);
-      //console.log(webhooks);
+      console.log(webhooks);
       // Detect if a webhook was already registered by Homey
 
       if (Array.isArray(webhooks.hooks)) {
           let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === Homey.env.WEBHOOK_URL);
         if (mywebhooks.length > 1) {
             this.log(`Found multiple webhooks, deleting all.`);
-            Homey.app.mylog(`Found multiple webhooks, deleting all.`);
+            this.homey.app.mylog(`Found multiple webhooks, deleting all.`);
             var self = this;
           mywebhooks.forEach(function(webhook) {
               self.delete({
@@ -348,17 +355,17 @@ class PointOauthClient extends OAuth2Client {
           this.postWebhook();
         } else if (mywebhooks.length === 1) {
             this.log(`Found 1 webhook, start listening. to ${mywebhooks[0].hook_id}`);
-            Homey.app.mylog(`Found 1 webhook, start listening. to ${mywebhooks[0].hook_id}`);
+            this.homey.app.mylog(`Found 1 webhook, start listening. to ${mywebhooks[0].hook_id}`);
             this.AttachWebhookListener(mywebhooks[0]);
         } else {
             this.log(`No hooks found, registering new webhook`);
-            Homey.app.mylog(`No hooks found, registering new webhook`);
+            this.homey.app.mylog(`No hooks found, registering new webhook`);
             this.postWebhook();
         }
       }
     } catch (err) {
       this.error('failed to get existing subscriptions', err.message);
-      Homey.app.mylog('failed to get existing subscriptions', err.message);
+      this.homey.app.mylog('failed to get existing subscriptions', err.message);
     }
   }
 }
@@ -377,6 +384,6 @@ function debounce(func, wait, immediate) {
     timeout = setTimeout(later, wait);
     if (callNow) func.apply(context, args);
   };
-};
+}
 
 module.exports = PointOauthClient;

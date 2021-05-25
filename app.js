@@ -11,40 +11,36 @@ const PointOauthClient = require('./Lib/PointOauthClient');
 
 class PointApp extends OAuth2App {
 
+  static OAUTH2_CLIENT = PointOauthClient; // Default: OAuth2Client
+  static OAUTH2_DEBUG = true; // Default: false
+  static OAUTH2_MULTI_SESSION = false; // Default: false
+
 
   onOAuth2Init() {
     this.utils = new util();
     this.logger_ative = false;
     //this.enableOAuth2Debug();
-    this.setOAuth2Config({
-      client: PointOauthClient,
-      clientId: Homey.env.CLIENT_ID,
-      clientSecret: Homey.env.CLIENT_SECRET,
-      apiUrl: 'https://api.minut.com/v1/',
-      tokenUrl: 'https://api.minut.com/v1/oauth/token',
-      authorizationUrl: 'https://api.minut.com/v1/oauth/authorize',
-    });
 
     this.log('PointApp is running...');
     this.log("Main", "App Started");
-    Homey.ManagerSettings.set('myLog', '');
-    this.logger_ative = Homey.ManagerSettings.get('myLogActive');
-    Homey.ManagerSettings.on('set', function (setting) {
+    this.homey.settings.set('myLog', '');
+    this.logger_ative = this.homey.settings.get('myLogActive');
+    this.homey.settings.on('set', function (setting) {
       this.log(`setting changed ${setting}`)
       if (setting === 'myLogActive')
       {
-        let active = Homey.ManagerSettings.get('myLogActive');
+        let active = this.homey.settings.get('myLogActive');
         this.log(`setting mylogactive to ${active}`)
-        Homey.app.logger_ative = active;
+        this.homey.app.logger_ative = active;
       }
     });
   }
 
   get MinutDriver() {
-    return Homey.ManagerDrivers.getDriver('Point');
+    return this.homey.ManagerDrivers.getDriver('Point');
   }
   get MinutHomeDriver() {
-    return Homey.ManagerDrivers.getDriver('PointHome');
+    return this.homey.ManagerDrivers.getDriver('PointHome');
   }
 
   async isAuthenticated() {
@@ -80,8 +76,8 @@ class PointApp extends OAuth2App {
     this.log('login() -> created new temporary OAuth2 client');
 
     // Start OAuth2 process
-    return new Homey.CloudOAuth2Callback(client.getAuthorizationUrl())
-      .on('url', url => Homey.ManagerApi.realtime('url', url))
+    return new this.homey.CloudOAuth2Callback(client.getAuthorizationUrl())
+      .on('url', url => this.homey.ManagerApi.realtime('url', url))
       .on('code', async code => {
         this.log('login() -> received OAuth2 code');
         try {
@@ -90,7 +86,7 @@ class PointApp extends OAuth2App {
           });
         } catch (err) {
           this.error('login() -> could not get token by code', err);
-          Homey.ManagerApi.realtime('error', new Error(Homey.__('authentication.re-login_failed_with_error', {
+          this.homey.ManagerApi.realtime('error', new Error(Homey.__('authentication.re-login_failed_with_error', {
             error: err.message || err.toString()
           })));
         }
@@ -114,13 +110,13 @@ class PointApp extends OAuth2App {
           client.save();
         } catch (err) {
           this.error('Could not create new OAuth2 client', err);
-          Homey.ManagerApi.realtime('error', new Error(Homey.__('authentication.re-login_failed_with_error', {
+          this.homey.ManagerApi.realtime('error', new Error(Homey.__('authentication.re-login_failed_with_error', {
             error: err.message || err.toString()
           })));
         }
 
         this.mylog('login() -> authenticated');
-        Homey.ManagerApi.realtime('authorized');
+        this.homey.ManagerApi.realtime('authorized');
 
         // Get Toon devices and call resetOAuth2Client on device to re-bind a new OAuth2Client
         // instance to the device
@@ -140,7 +136,7 @@ class PointApp extends OAuth2App {
 
         } catch (err) {
           this.error('Could not reset OAuth2 client on Toon device instance', err);
-          Homey.ManagerApi.realtime('error', new Error(Homey.__('authentication.re-login_failed_with_error', {
+          this.homey.ManagerApi.realtime('error', new Error(Homey.__('authentication.re-login_failed_with_error', {
             error: err.message || err.toString()
           })));
         }
@@ -221,7 +217,7 @@ class PointApp extends OAuth2App {
   // Write information to history and cleanup 20% when history above 2000 lines
   async writeLog(logLine) {
     // console.log(logLine);
-    let savedHistory = Homey.ManagerSettings.get('myLog');
+    let savedHistory = this.homey.settings.get('myLog');
     if (savedHistory != undefined) {
       // cleanup history
       let lineCount = savedHistory.split(/\r\n|\r|\n/).length;
@@ -234,7 +230,7 @@ class PointApp extends OAuth2App {
       // end cleanup
       logLine = logLine + "\n" + savedHistory;
     }
-    Homey.ManagerSettings.set('myLog', logLine);
+    this.homey.settings.set('myLog', logLine);
     logLine = "";
   }
   async mylog(...message)
