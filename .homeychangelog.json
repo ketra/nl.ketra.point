@@ -31,5 +31,8 @@
   },
   "1.2.1": {
     "en": "Readme improved, motion added"
+  },
+  "2.0.1": {
+    "en": "Fixed unable to login"
   }
 }
