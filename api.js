@@ -1,7 +1,5 @@
 'use strict';
 
-const Homey = require('homey');
-
 module.exports = {
     async GetLogin({homey, body}) {
         return await homey.app.isAuthenticated();
@@ -21,10 +19,9 @@ module.exports = {
     },
 
     async PostLogin({homey, body}) {
-        const loginState = body.state;
-        if (loginState === true) { // login
+        if (body.state === true) { // login
             return await homey.app.login();
-        } else if (loginState === false) { // logout
+        } else if (body.state === false) { // logout
             return await homey.app.logout();
         }
     }

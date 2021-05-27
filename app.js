@@ -36,11 +36,11 @@ class PointApp extends OAuth2App {
     });
   }
 
-  get MinutDriver() {
-    return this.homey.ManagerDrivers.getDriver('Point');
+  MinutDriver() {
+    return this.homey.drivers.getDriver('Point');
   }
-  get MinutHomeDriver() {
-    return this.homey.ManagerDrivers.getDriver('PointHome');
+  MinutHomeDriver() {
+    return this.homey.drivers.getDriver('PointHome');
   }
 
   async isAuthenticated() {
@@ -53,6 +53,7 @@ class PointApp extends OAuth2App {
       this.error('isAuthenticated() -> could not get current session:', err);
       this.mylog('isAuthenticated() -> could not get current session:', err);
       throw new Error('Could not get current OAuth2 session');
+      return  false
     }
   }
   async login() {
@@ -76,9 +77,9 @@ class PointApp extends OAuth2App {
     this.log('login() -> created new temporary OAuth2 client');
 
     // Start OAuth2 process
-    return new this.homey.CloudOAuth2Callback(client.getAuthorizationUrl())
-      .on('url', url => this.homey.ManagerApi.realtime('url', url))
-      .on('code', async code => {
+    let myOAuth2Callback = await this.homey.cloud.createOAuth2Callback(client.getAuthorizationUrl())
+    myOAuth2Callback.on('url', url => this.homey.api.realtime('url', url))
+    myOAuth2Callback.on('code', async code => {
         this.log('login() -> received OAuth2 code');
         try {
           await client.getTokenByCode({
@@ -86,7 +87,7 @@ class PointApp extends OAuth2App {
           });
         } catch (err) {
           this.error('login() -> could not get token by code', err);
-          this.homey.ManagerApi.realtime('error', new Error(Homey.__('authentication.re-login_failed_with_error', {
+          this.homey.api.realtime('error', new Error(this.homey.__('authentication.re-login_failed_with_error', {
             error: err.message || err.toString()
           })));
         }
@@ -110,62 +111,65 @@ class PointApp extends OAuth2App {
           client.save();
         } catch (err) {
           this.error('Could not create new OAuth2 client', err);
-          this.homey.ManagerApi.realtime('error', new Error(Homey.__('authentication.re-login_failed_with_error', {
+          this.homey.api.realtime('error', new Error(this.homey.__('authentication.re-login_failed_with_error', {
             error: err.message || err.toString()
           })));
         }
 
         this.mylog('login() -> authenticated');
-        this.homey.ManagerApi.realtime('authorized');
+        this.homey.api.realtime('authorized');
 
         // Get Toon devices and call resetOAuth2Client on device to re-bind a new OAuth2Client
         // instance to the device
         try {
-          await this.MinutDriver
+          await this.homey.drivers.getDriver('Point')
             .getDevices()
             .forEach(minutDevice => minutDevice.resetOAuth2Client({
               sessionId: session.id,
-              configId: this.MinutDriver.getOAuth2ConfigId(),
+              configId: this.homey.drivers.getDriver('Point').getOAuth2ConfigId(),
             }));
-          await this.MinutHomeDriver
+          await this.homey.drivers.getDriver('PointHome')
             .getDevices()
             .forEach(minutHome => minutHome.resetOAuth2Client({
               sessionId: session.id,
-              configId: this.MinutHomeDriver.getOAuth2ConfigId(),
+              configId: this.homey.drivers.getDriver('PointHome').getOAuth2ConfigId(),
             }));
 
         } catch (err) {
           this.error('Could not reset OAuth2 client on Toon device instance', err);
-          this.homey.ManagerApi.realtime('error', new Error(Homey.__('authentication.re-login_failed_with_error', {
+          this.homey.api.realtime('error', new Error(this.homey.__('authentication.re-login_failed_with_error', {
             error: err.message || err.toString()
           })));
         }
         this.mylog('login() -> reset devices to new OAuth2 client');
       })
-      .generate();
+    //myOAuth2Callback.generate();
+    return myOAuth2Callback
   }
-  async logout() {
+
+   async logout() {
     this.log('logout()');
     const session = await this._getSession();
+    if (!session) return true
     const sessionId = Object.keys(session)[0];
     this.deleteOAuth2Client({
       sessionId,
       configId: session.configId
-    });
-
+    })
+    var self = this
     // Get Minut devices and mark as unavailable
     return Promise.all(
-      this.MinutDriver
+       this.homey.drivers.getDriver('Point')
       .getDevices()
       .map(function(minutDevice) {
         minutDevice.unreadyDevice();
-        minutDevice.setUnavailable(Homey.__('authentication.re-authorize'));
+        minutDevice.setUnavailable(self.homey.__('authentication.re-authorize'));
       }),
-      this.MinutHomeDriver
+       this.homey.drivers.getDriver('PointHome')
       .getDevices()
       .map(function(minutHome) {
         minutHome.unreadyDevice();
-        minutHome.setUnavailable(Homey.__('authentication.re-authorize'));
+        minutHome.setUnavailable(self.homey.__('authentication.re-authorize'));
       })
     );
   }

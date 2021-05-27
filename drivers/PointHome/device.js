@@ -1,7 +1,7 @@
 ﻿const Homey = require('homey');
 const utils = require('../../Lib/utils');
 const { OAuth2Device } = require('homey-oauth2app');
-const POLL_INTERVAL = 900 * 1000;
+const POLL_INTERVAL = 3600 * 1000;
 
 class PointHome extends OAuth2Device {
 

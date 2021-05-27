@@ -11,36 +11,45 @@ class PointOauthClient extends OAuth2Client {
   static TOKEN_URL = 'https://api.minut.com/v5/oauth/token';
   static AUTHORIZATION_URL = 'https://api.minut.com/v5/oauth/authorize';
 
-  async getDeviceData(uri) {
+  async getDeviceData(uri)
+  {
       return this.get({
           path: uri
       });
   }
-  async getDevices() {
+
+  async getDevices()
+  {
       this.log("Getting Devices");
       return this.get({
           path: 'devices/',
           query: { "active": true },
       });
   }
-  async getHomes() {
+
+  async getHomes()
+  {
       return this.get({
           path: 'homes/'
       });
   }
-  async register_device(device) {
+
+  async register_device(device)
+  {
     this.log(`Register ${device.id}`);
     this.homey.app.mylog(`Register ${device.id}`);
     devices.push(device);
   }
 
-  async delete_device(device) {
+  async delete_device(device)
+  {
     this.log(`deRegister ${device.id}`);
     this.homey.app.mylog(`deRegister ${device.id}`);
     devices.splice(devices.indexOf(device), 1);
   }
 
-  get_device(device_id) {
+  get_device(device_id)
+  {
     this.log(`Looking for dev ${device_id}`);
     this.homey.app.mylog(`Looking for dev ${device_id}`);
     let dev = devices.find(x => x.id === device_id);
@@ -49,7 +58,8 @@ class PointOauthClient extends OAuth2Client {
     return dev;
   }
 
-  async AttachWebhookListener(data) {
+  async AttachWebhookListener(data)
+  {
     this.log(`Attached listener to ${data.hook_id}`)
     this.homey.app.mylog(`Attached listener to ${data.hook_id}`)
     const debouncedMessageHandler = debounce(this._webhookhandler.bind(this), 500, true)
@@ -58,7 +68,8 @@ class PointOauthClient extends OAuth2Client {
     return myWebhook
   }
 
-  _webhookhandler(args) {
+  _webhookhandler(args)
+  {
       let datetime = new Date().getTime();
     this.log('_webhookhandler', datetime);
     this.homey.app.mylog('_webhookhandler', datetime);
@@ -219,7 +230,8 @@ class PointOauthClient extends OAuth2Client {
     }
   }
 
-  RegisterFlows() {
+  RegisterFlows()
+  {
     this._flowTriggerGenericAlarm = this.homey.flow.getDeviceTriggerCard('any_alarm');
     this._flowTriggeralarm_heard = this.homey.flow.getDeviceTriggerCard('alarm_heard');
     this._flowTriggeralarm_Button = this.homey.flow.getDeviceTriggerCard("short_button_press");
@@ -240,7 +252,8 @@ class PointOauthClient extends OAuth2Client {
     this._flowTriggeralarm_glassbreak = this.homey.flow.getDeviceTriggerCard("glassbreak");
   }
 
-  async postWebhook() {
+  async postWebhook()
+  {
     try {
       var webhook = await this.post({
         path: `webhooks`,
@@ -301,7 +314,7 @@ class PointOauthClient extends OAuth2Client {
     try
     {
       let webhooks = await this.getDeviceData(`webhooks`);
-      let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url === Homey.env.WEBHOOK_URL);
+      let mywebhooks = webhooks.hooks.filter((webhook) => webhook.url.startsWith(Homey.env.WEBHOOK_URL));
       this.homey.app.mylog(`deleting all webhooks.`);
       var self = this;
       mywebhooks.forEach(function(webhook) {
@@ -320,12 +333,12 @@ class PointOauthClient extends OAuth2Client {
     }
   }
 
-
   /**
    * Method that will request a subscription for webhook events for the next hour.
    * @returns {Promise<void>}
    */
-  async registerWebhookSubscription() {
+  async registerWebhookSubscription()
+  {
     let webhookIsRegistered = false;
 
     this.log('registerWebhookSubscription()');
@@ -333,7 +346,7 @@ class PointOauthClient extends OAuth2Client {
 
     // Refresh webhooks after 15 minutes of inactivity
     clearTimeout(this._registerWebhookSubscriptionTimeout);
-    this._registerWebhookSubscriptionTimeout = setTimeout(() => this.registerWebhookSubscription(), 1000 * 60 * 15);
+    this._registerWebhookSubscriptionTimeout = setTimeout(() => this.registerWebhookSubscription(), 1000 * 60 * 60);
 
     // TODO: get current webhook
     try {
