@@ -34,5 +34,8 @@
   },
   "2.0.1": {
     "en": "Fixed unable to login"
+  },
+  "2.0.2": {
+    "en": "fixed error with data collection"
   }
 }
