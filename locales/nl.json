@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "title": "Minut Account",
+    "login_intro": "Klink hier om in te loggen met uw Minut account",
+    "login_button": "Login",
+    "logged_in": "Op dit moment bent u ingelogd.",
+    "logout_intro": "Klik hier om uit te loggen.",
+    "logout_button": "Loguit",
+    "refresh_button": "ververs Webhooks",
+    "download_button": "Download Historie",
+    "logger_box": "Activeer Debug Logging",
+    "delete_button": "verwijder oude hooks"
+  },
+  "tab1": {
+    "title": "Dashboard",
+    "history": {
+      "date": "Datum",
+      "time": "Tijd",
+      "smode": "Toezicht Mode",
+      "source": "bron",
+      "action": "Actie"
+    }
+  }
+}

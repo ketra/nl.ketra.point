@@ -55,8 +55,8 @@
       {
         "id": "alarm_grace_period_expired",
         "title": {
-          "en": "Motion while alarm enabled",
-          "nl": "Beweging tijdens alarm"
+          "en": "Alarm triggered",
+          "nl": "Alarm afgegaan"
         },
         "args": [
           {
@@ -69,8 +69,8 @@
       {
         "id": "alarm_heard",
         "title": {
-          "en": "An alarm was heard.",
-          "nl": "Een alarm gehoord"
+          "en": "An alarm was detected",
+          "nl": "Een alarm gedetecteerd"
         },
         "args": [
           {
@@ -83,8 +83,8 @@
       {
         "id": "any_alarm",
         "title": {
-          "en": "an alarm was triggered",
-          "nl": "er is een alarm"
+          "en": "Any alarm was triggered",
+          "nl": "Er is een alarm"
         },
         "args": [
           {
@@ -108,8 +108,8 @@
       {
         "id": "avg_sound_high",
         "title": {
-          "en": "Loud noise heard",
-          "nl": "Hard geluid gehoord"
+          "en": "Sound level above threshold",
+          "nl": "Geluid niveau boven grenswaarde"
         },
         "args": [
           {
@@ -225,8 +225,8 @@
       {
         "id": "humidity_high",
         "title": {
-          "en": "High humidity",
-          "nl": "Hoge luchtvochtigheid"
+          "en": "humidity above threshold",
+          "nl": "luchtvochtigheid boven grenswaarde"
         },
         "args": [
           {
@@ -250,8 +250,8 @@
       {
         "id": "humidity_low",
         "title": {
-          "en": "Low humidity",
-          "nl": "Lage luchtvochtigheid"
+          "en": "Humidity below threshold",
+          "nl": "Luchtvochtigheid onder grenswaarde"
         },
         "args": [
           {
@@ -300,7 +300,7 @@
       {
         "id": "pir_motion",
         "title": {
-          "en": "Motion was seen",
+          "en": "Motion was detected",
           "nl": "Beweging gedetecteerd."
         },
         "args": [
@@ -342,8 +342,8 @@
       {
         "id": "temperature_high",
         "title": {
-          "en": "high temperature",
-          "nl": "hoge temperatuur"
+          "en": "Temperature above threshold",
+          "nl": "Temperatuur boven grenswaarde"
         },
         "tokens": [
           {
@@ -367,8 +367,8 @@
       {
         "id": "temperature_low",
         "title": {
-          "en": "Low temperature",
-          "nl": "Lage temperatuur"
+          "en": "Temperature below threshold",
+          "nl": "Temperatuur onder grenswaarde"
         },
         "tokens": [
           {
@@ -447,8 +447,8 @@
       {
         "id": "set_alarm_off",
         "title": {
-          "en": "Alarm Off",
-          "nl": "Alarm uit"
+          "en": "Turn alarm off",
+          "nl": "Zet alarm uit"
         },
         "args": [
           {
@@ -461,8 +461,8 @@
       {
         "id": "set_alarm_on",
         "title": {
-          "en": "Alarm ON",
-          "nl": "Alarm Aan"
+          "en": "Turn alarm on",
+          "nl": "Zet alarm aan"
         },
         "args": [
           {

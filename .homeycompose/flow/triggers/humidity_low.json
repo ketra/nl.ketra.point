@@ -1,8 +1,8 @@
 {
   "id": "humidity_low",
   "title": {
-    "en": "Low humidity",
-    "nl": "Lage luchtvochtigheid"
+    "en": "Humidity below threshold",
+    "nl": "Luchtvochtigheid onder grenswaarde"
   },
   "args": [
     {

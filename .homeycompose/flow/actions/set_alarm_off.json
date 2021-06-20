@@ -1,8 +1,8 @@
       {
         "id": "set_alarm_off",
         "title": {
-          "en": "Alarm Off",
-          "nl": "Alarm uit"
+          "en": "Turn alarm off",
+          "nl": "Zet alarm uit"
         },
         "args": [
           {

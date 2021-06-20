@@ -80,24 +80,24 @@ class MinutDevice extends OAuth2Device {
         this._GetGeneralData();
     }
 
-    // async _GetDataForAction(action, capability) {
-    //     let datum = new Date();
-    //     datum.setHours(datum.getHours() - 1);
-    //     let path = `devices/${this.id}/${action}?start_at=${datum.toISOString()}`
-    //
-    //     this.oAuth2Client.getDeviceData(path).then((data) => {
-    //         if (Array.isArray(data.values) && data.values.length > 0) {
-    //             var value = data.values[data.values.length - 1]
-    //             let collectiontime = new Date(value.datetime);
-    //             this.log(`Collecting ${action}  With Date ${collectiontime.toLocaleString()} And value ${value.value}`);
-    //             this.homey.app.mylog(`Collecting ${action}  With Date ${collectiontime.toLocaleString()} And value ${value.value}`);
-    //             this.setCapabilityValue(capability, parseFloat(value.value));
-    //         } else {
-    //             this.log(`No Data found for ${action}`);
-    //             this.homey.app.mylog(`No Data found for ${action}`);
-    //         }
-    //     });
-    // }
+    async _GetDataForAction(action, capability) {
+         let datum = new Date();
+         datum.setHours(datum.getHours() - 1);
+         let path = `devices/${this.id}/${action}?start_at=${datum.toISOString()}`
+
+         this.oAuth2Client.getDeviceData(path).then((data) => {
+             if (Array.isArray(data.values) && data.values.length > 0) {
+                 var value = data.values[data.values.length - 1]
+                 let collectiontime = new Date(value.datetime);
+                 this.log(`Collecting ${action}  With Date ${collectiontime.toLocaleString()} And value ${value.value}`);
+                 this.homey.app.mylog(`Collecting ${action}  With Date ${collectiontime.toLocaleString()} And value ${value.value}`);
+                 this.setCapabilityValue(capability, parseFloat(value.value));
+             } else {
+                 this.log(`No Data found for ${action}`);
+                 this.homey.app.mylog(`No Data found for ${action}`);
+             }
+         });
+     }
 
     async _GetGeneralData() {
 
@@ -106,10 +106,13 @@ class MinutDevice extends OAuth2Device {
         this.oAuth2Client.getDeviceData(path).then((data) => {
             console.log(data)
 			this.setCapabilityValue('measure_temperature', parseFloat(data.latest_sensor_values.temperature.value))
+            this.log(`Set temperature to ${data.latest_sensor_values.temperature.value}`)
             this.setCapabilityValue('measure_humidity', parseFloat(data.latest_sensor_values.humidity.value))
-            this.setCapabilityValue('measure_pressure', parseFloat(data.latest_sensor_values.pressure.value))
+            this.log(`Set humidity to ${data.latest_sensor_values.humidity.value}`)
             this.setCapabilityValue('measure_noise', parseFloat(data.latest_sensor_values.sound.value))
+            this.log(`Set noise to ${data.latest_sensor_values.sound.value}`)
             this.setCapabilityValue('measure_battery', parseFloat(data.battery.percent))
+            this.log(`Set batery to ${data.latest_sensor_values.battery}`)
 
             if (data.ongoing_events.includes("avg_sound_high"))
                 this.setCapabilityValue('alarm_Noise', true);
@@ -125,6 +128,10 @@ class MinutDevice extends OAuth2Device {
                 this.setCapabilityValue('alarm_Hum', false);
 
             this.setCapabilityValue('alarm_motion', false);
+
+            this._GetDataForAction('pressure', "measure_pressure")
+        }).catch((err) => {
+            this.log(`Error: ${err}`)
         });
     }
 

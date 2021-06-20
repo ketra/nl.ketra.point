@@ -1,8 +1,8 @@
 {
   "id": "any_alarm",
   "title": {
-    "en": "an alarm was triggered",
-    "nl": "er is een alarm"
+    "en": "Any alarm was triggered",
+    "nl": "Er is een alarm"
   },
   "args": [
     {

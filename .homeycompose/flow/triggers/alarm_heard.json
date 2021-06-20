@@ -1,8 +1,8 @@
 {
   "id": "alarm_heard",
   "title": {
-    "en": "An alarm was heard.",
-    "nl": "Een alarm gehoord"
+    "en": "An alarm was detected",
+    "nl": "Een alarm gedetecteerd"
   },
   "args": [
     {

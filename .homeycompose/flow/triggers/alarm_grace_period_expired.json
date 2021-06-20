@@ -1,8 +1,8 @@
 {
   "id": "alarm_grace_period_expired",
   "title": {
-    "en": "Motion while alarm enabled",
-    "nl": "Beweging tijdens alarm"
+    "en": "Alarm triggered",
+    "nl": "Alarm afgegaan"
   },
   "args": [
     {

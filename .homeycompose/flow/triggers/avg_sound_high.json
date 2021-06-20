@@ -1,8 +1,8 @@
 {
   "id": "avg_sound_high",
   "title": {
-    "en": "Loud noise heard",
-    "nl": "Hard geluid gehoord"
+    "en": "Sound level above threshold",
+    "nl": "Geluid niveau boven grenswaarde"
   },
   "args": [
     {

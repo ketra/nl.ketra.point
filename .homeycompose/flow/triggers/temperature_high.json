@@ -1,8 +1,8 @@
 {
   "id": "temperature_high",
   "title": {
-    "en": "high temperature",
-    "nl": "hoge temperatuur"
+    "en": "Temperature above threshold",
+    "nl": "Temperatuur boven grenswaarde"
   },
   "tokens": [
     {

@@ -101,6 +101,7 @@ class PointOauthClient extends OAuth2Client {
         this.log(eventtype);
         //this.SetValue(device);
         let sensor_value = args.body.event.sensor_value;
+        device._GetStateInfo();
         this._flowTriggerGenericAlarm.trigger(device, {
           "Alarm": eventtype
         }, {});

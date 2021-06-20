@@ -1,7 +1,7 @@
 {
   "id": "pir_motion",
   "title": {
-    "en": "Motion was seen",
+    "en": "Motion was detected",
     "nl": "Beweging gedetecteerd."
   },
   "args": [

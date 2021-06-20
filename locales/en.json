@@ -16,9 +16,9 @@
     "history": {
         "date": "Date",
         "time": "Time",
-        "smode": "Toezicht Mode",
+        "smode": "surveillance Mode",
         "source": "Source",
-        "action": "Actie"
+        "action": "Action"
     }
 }
 }

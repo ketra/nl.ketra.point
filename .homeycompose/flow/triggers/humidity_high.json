@@ -1,8 +1,8 @@
 {
   "id": "humidity_high",
   "title": {
-    "en": "High humidity",
-    "nl": "Hoge luchtvochtigheid"
+    "en": "humidity above threshold",
+    "nl": "luchtvochtigheid boven grenswaarde"
   },
   "args": [
     {

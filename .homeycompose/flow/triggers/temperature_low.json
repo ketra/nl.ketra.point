@@ -1,8 +1,8 @@
 {
   "id": "temperature_low",
   "title": {
-    "en": "Low temperature",
-    "nl": "Lage temperatuur"
+    "en": "Temperature below threshold",
+    "nl": "Temperatuur onder grenswaarde"
   },
   "tokens": [
     {
