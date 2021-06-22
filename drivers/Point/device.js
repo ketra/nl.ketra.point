@@ -15,6 +15,14 @@ class MinutDevice extends OAuth2Device {
 
     async onOAuth2Init() {
         this.log('init PointDevice');
+        if (this.hasCapability("measure_pressure")) {
+            this.homey.app.mylog("Remove Measure pressure from device")
+            this.removeCapability("measure_pressure").then(this.log).catch(this.error);
+        }
+        if (this.hasCapability("measure_luminance")) {
+            this.homey.app.mylog("Remove luminance from device")
+            this.removeCapability("measure_luminance").then(this.log).catch(this.error);
+        }
         this.readyDevice();
     }
 
@@ -26,7 +34,7 @@ class MinutDevice extends OAuth2Device {
         this.homey.app.mylog(`token = ${this.oAuth2Client.getToken().access_token}`);
         await this.oAuth2Client.registerWebhookSubscription();
         await this.oAuth2Client.RegisterFlows();
-        this._GetStateInfo();
+        //this._GetStateInfo();
     }
     unreadyDevice() {
         this.log('Cleared Timeout');
@@ -112,7 +120,7 @@ class MinutDevice extends OAuth2Device {
             this.setCapabilityValue('measure_noise', parseFloat(data.latest_sensor_values.sound.value))
             this.log(`Set noise to ${data.latest_sensor_values.sound.value}`)
             this.setCapabilityValue('measure_battery', parseFloat(data.battery.percent))
-            this.log(`Set batery to ${data.latest_sensor_values.battery}`)
+            this.log(`Set batery to ${data.battery.percent}`)
 
             if (data.ongoing_events.includes("avg_sound_high"))
                 this.setCapabilityValue('alarm_Noise', true);
@@ -129,7 +137,7 @@ class MinutDevice extends OAuth2Device {
 
             this.setCapabilityValue('alarm_motion', false);
 
-            this._GetDataForAction('pressure', "measure_pressure")
+            //this._GetDataForAction('pressure', "measure_pressure")
         }).catch((err) => {
             this.log(`Error: ${err}`)
         });
