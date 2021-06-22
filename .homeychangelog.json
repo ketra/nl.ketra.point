@@ -37,5 +37,8 @@
   },
   "2.0.2": {
     "en": "fixed error with data collection"
+  },
+  "2.0.3": {
+    "en": "removed pressure and luminance from device"
   }
 }
